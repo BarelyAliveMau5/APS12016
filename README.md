@@ -14,8 +14,9 @@
 ######pontos ruins:
 
 - o código tá mal organizado, eu nunca programei em java antes, a sintaxe é parecida com c# com umas diferenças, internet ajuda.
-gerar 1000000 itens consome em torno de 50mb e cresce se você tentar gerar novamente (memory leak? é culpa do garbage collector, eu deleto a instancia anterior da lista de nomes!)
-- usei muito codigo inline, reduz o tamanho do frmPrincipal porém fica mais dificil de ler, *comentarios salvam vidas de golfinhos :+1:*
+gerar 1000000 itens leva em torno de 5 segundos mas consome aproximadamente 50mb, e isso continua a crescer se criar novamente. acho que é culpa do garbage collector do java né..
+- usei muito codigo em closures, isso reduz o tamanho do frmPrincipal porém fica mais dificil de ler, *comentarios no código fonte salvam vidas de golfinhos :+1:*
+
 
 aqui talvez eu coloque uns resultados de testes no meu pc, junto da configuração dele e as opções do programa
 
