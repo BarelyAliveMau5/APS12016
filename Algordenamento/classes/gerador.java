@@ -35,7 +35,6 @@ public class gerador implements Runnable{
         this.tamanho = tamanho;
         this.prefixo = prefixo;
         this.posfixo = posfixo;
-        processado = 0;
     }
     
     /**
@@ -70,7 +69,7 @@ public class gerador implements Runnable{
     public void run() {
         nomes = new String[tamanho];
         concluido = false;
-        
+        processado = 0;
         switch (Modo){
         case aleatoria:
             
@@ -81,7 +80,7 @@ public class gerador implements Runnable{
                     
                     processado++;
                 }
-            } 
+            }
             
             //uma lista é gerada e então embaralhada, leva o dobro de operações
             else {
@@ -104,8 +103,14 @@ public class gerador implements Runnable{
         
         case semi_aleatoria:
             break;
+            
         case inversa:
+            for (int i=tamanho; i>0;i--) 
+                nomes[i] = prefixo + i + posfixo;
+                
+                processado++;
             break;
+            
         case pouca_variacao:
             break;
         default:
