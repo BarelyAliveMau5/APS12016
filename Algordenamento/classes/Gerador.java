@@ -5,16 +5,15 @@ package classes;
  * mais opções, como lista de caracteres e tals, mas ia dar trabalho demais, e
  * com o tempo escasso isso iria atrapalhar mais do que dar nota.
  **/
-public class gerador implements Runnable
+public class Gerador extends BaseT implements Runnable
 {
-    private String nomes[];
-
     // operações realizadas. ao invez de porcentagem, que é mais lento
-    private int processado;
-
     public enum modos
     {
-        aleatoria, semi_aleatoria, inversa, pouca_variacao
+        aleatoria, 
+        semi_aleatoria, 
+        inversa, 
+        pouca_variacao
     }
 
     // se é ou não permitido repetir (no caso, usar somente numeros aleatorios,
@@ -36,7 +35,7 @@ public class gerador implements Runnable
     /**
      * prepara o worker
      **/
-    public gerador(boolean repetir, boolean fixo, modos Modo, int tamanho, String prefixo, String posfixo)
+    public Gerador(boolean repetir, boolean fixo, modos Modo, int tamanho, String prefixo, String posfixo)
     {
         this.repetir = repetir;
         this.Modo = Modo;
@@ -76,20 +75,11 @@ public class gerador implements Runnable
     {
         nomes = null;
     }
-
+    
     /**
-     * getter do processado
+     * gera a lista de nomes usnado os atributos
      **/
-    public int Processado()
-    {
-        return processado;
-    }
-
-    /**
-     * só é usado pra rodar a thread de criação
-     ***/
-    @Override
-    public void run()
+    public void Gerar()
     {
         nomes = new String[tamanho];
         concluido = false;
@@ -116,7 +106,6 @@ public class gerador implements Runnable
                         // o metodo substring exclui os primeiros temp.length()
                         // caracteres
                         nomes[i] = prefixo + pad.substring(temp.length()) + temp;
-
                         processado++;
                     }
                 } else
@@ -125,21 +114,18 @@ public class gerador implements Runnable
                     for (int i = 0; i < tamanho; i++)
                     {
                         nomes[i] = prefixo + ((int) (Math.random() * tamanho)) + posfixo;
-
                         processado++;
                     }
                 }
             }
-            // aqui uma lista é gerada e então embaralhada, leva o dobro de
-            // operações
+            // aqui uma lista é gerada e então embaralhada, leva o dobro de operações
             else
             {
-                if (fixo)
+                if (fixo) 
                 {
                     for (int i = 0; i < tamanho; i++)
                     {
-                        // tecnicamente isso não pode ser simplificado,
-                        // adicionaria mais processamento e complexidade
+                        // não simplifique mais do que isso, é inutil
                         nomes[i] = prefixo + pad.substring(String.valueOf(i).length() + posfixo.length()) + i + posfixo;
                         processado++;
                     }
@@ -198,5 +184,14 @@ public class gerador implements Runnable
             break;
         }
         concluido = true;
+    }
+    
+    /**
+     * só é usado pra rodar a thread de criação
+     ***/
+    @Override
+    public void run()
+    {
+        Gerar();
     }
 }

@@ -10,8 +10,8 @@ import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.border.EtchedBorder;
 
-import classes.gerador;
-import classes.gerador.modos;
+import classes.Gerador;
+import classes.Gerador.modos;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -35,34 +35,34 @@ import javax.swing.ListSelectionModel;
 
 public class frmPrincipal extends JFrame
 {
-    private JTextField txtPrefix;
-    private JTextField txtPostfix;
-    private ButtonGroup bg;
-    private JSpinner spNumItems;
-    private JRadioButton rbRandom;
-    private JRadioButton rbSemiRandom;
-    private JRadioButton rbLowVariation;
-    private JLabel lblPrefixo;
-    private JCheckBox cbRepeat;
-    private JLabel lblNitens;
-    private JLayeredPane panel;
-    private JCheckBox chckbxTamanhoFixo;
-    private JRadioButton rbInverse;
-    private JButton btnGerar;
-    private Timer tim;
-    private gerador ger;
-    private JButton btnMostrarLista;
-    private JButton btnOrdenar;
-    private JLabel lblAlgoritimo;
-    private JLabel lblPorcento;
-    private JProgressBar pbProgresso;
+    private JLabel          lblOperaes;
+    private JLabel          lblAleatoriedade;
+    private JLabel          lblPsfixo;
+    private JLabel          lblAlgoritimo;
+    private JLabel          lblPorcento;
+    private JLabel          lblNitens;
+    private JLabel          lblPrefixo;
+    private JButton         btnMostrarLista;
+    private JButton         btnOrdenar;
+    private JButton         btnGerar;
+    private JTextField      txtPrefix;
+    private JTextField      txtPostfix;
+    private JRadioButton    rbRandom;
+    private JRadioButton    rbSemiRandom;
+    private JRadioButton    rbLowVariation;
+    private JRadioButton    rbInverse;
+    private JCheckBox       cbRepeat;
+    private JCheckBox       chckbxTamanhoFixo;
+    private JSpinner        spNumItems;
+    private JPanel          pnOrdenar;
+    private JLayeredPane    panel;
+    private JProgressBar    pbProgresso;
     private JComboBox<String> cbAlgoritimo;
-    private JLabel lblOperaes;
-    private JLabel lblAleatoriedade;
-    private JLabel lblPsfixo;
-    private JPanel pnOrdenar;
-    private JScrollPane scrollPane;
-    private JList<String> lstNomes;
+    private JScrollPane     scrollPane;
+    private JList<String>   lstNomes;
+    private ButtonGroup     bg;
+    private Gerador         ger;
+    private Timer           tim;
 
     /**
      * Launch the application.
@@ -195,7 +195,7 @@ public class frmPrincipal extends JFrame
                 if (rbLowVariation.isSelected())    Modo = modos.pouca_variacao;
                 if (rbSemiRandom.isSelected())      Modo = modos.semi_aleatoria;
 
-                ger = new gerador(cbRepeat.isSelected(), // permitir repetições
+                ger = new Gerador(cbRepeat.isSelected(), // permitir repetições
                         chckbxTamanhoFixo.isSelected(), // tamanho fixo
                         Modo, // modo
                         tamanho, // numero total de itens
@@ -210,7 +210,7 @@ public class frmPrincipal extends JFrame
                 {
                     public void actionPerformed(ActionEvent arg0)
                     {
-                        int processado = ger.Processado();
+                        int processado = ger.getProcessado();
                         lblPorcento.setText(String.valueOf(processado));
                         pbProgresso.setValue(processado);
 

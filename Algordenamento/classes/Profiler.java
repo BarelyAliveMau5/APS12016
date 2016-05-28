@@ -1,12 +1,12 @@
 package classes;
 
-public class profiler
+public class Profiler
 {
     private long init;
     private boolean running;
     private long ending;
 
-    public profiler()
+    public Profiler()
     {
         if (!running)
         {
