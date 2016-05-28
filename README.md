@@ -13,8 +13,8 @@
 
 ######pontos ruins:
 
-- o código tá mal organizado, eu nunca programei em java antes, a sintaxe é parecida com c# com umas diferenças, internet ajuda.
-gerar 1000000 itens leva em torno de 5 segundos mas consome aproximadamente 50mb, e isso continua a crescer se criar novamente. acho que é culpa do garbage collector do java né..
+- o código tá meio mal organizado, ainda estou arrumando onde posso e colocando muitos comentarios em tudo de util.
+- gerar 1000000 itens leva em torno de 5 segundos mas consome aproximadamente 50mb, e isso continua a crescer se criar novamente. acho que é culpa do garbage collector do java né..
 - usei muito codigo em closures, isso reduz o tamanho do frmPrincipal porém fica mais dificil de ler, *comentarios no código fonte salvam vidas de golfinhos :+1:*
 
 
