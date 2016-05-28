@@ -52,6 +52,10 @@ public class frmPrincipal extends JFrame {
     private JProgressBar pbProgresso;
     private JList<String> lstNomes;
     private JComboBox<String> cbAlgoritimo;
+    private JLabel lblOperaes;
+    private JLabel lblAleatoriedade;
+    private JLabel lblPsfixo;
+    private JPanel panel_1;
     
     /**
      * Launch the application.
@@ -113,7 +117,7 @@ public class frmPrincipal extends JFrame {
         chckbxTamanhoFixo.setSelected(true);
         panel.add(chckbxTamanhoFixo, "cell 0 2");
         
-        JLabel lblAleatoriedade = new JLabel("Aleatoriedade:");
+        lblAleatoriedade = new JLabel("Aleatoriedade:");
         panel.add(lblAleatoriedade, "cell 0 3");
         
         rbRandom = new JRadioButton("Aleatória");
@@ -140,7 +144,7 @@ public class frmPrincipal extends JFrame {
         panel.add(txtPrefix, "cell 1 8,grow");
         txtPrefix.setColumns(10);
         
-        JLabel lblPsfixo = new JLabel("Texto pósfixo:");
+        lblPsfixo = new JLabel("Texto pósfixo:");
         panel.add(lblPsfixo, "cell 0 9,alignx left");
         
         
@@ -148,6 +152,8 @@ public class frmPrincipal extends JFrame {
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
                 int tamanho = Integer.valueOf(spNumItems.getValue().toString());
+                
+                //quando não é permitido repetições, acontece o dobro de operações.
                 pbProgresso.setMaximum(cbRepeat.isSelected() ? tamanho : tamanho * 2);
                 ger = new gerador(cbRepeat.isSelected(), 
                         modos.aleatoria, 
@@ -155,16 +161,20 @@ public class frmPrincipal extends JFrame {
                         txtPrefix.getText(),
                         txtPostfix.getText());
                 
+                //talvez isso não mude muita coisa pro garbage collector..
                 ger.LimparNomes();
+                
+                //gera sempre um novo timer, não sei como otimizar isso em java
                 tim = new Timer(16, new ActionListener() {
                     public void actionPerformed(ActionEvent arg0) {
                        int processado = ger.Processado();
                        lblPorcento.setText(String.valueOf(processado));
                        pbProgresso.setValue(processado);
-                       if (ger.getConcluido()) {
-                           lblPorcento.setText("Concluido");
+                       
+                       //se não parar, novos timers vão persistir
+                       if (ger.getConcluido()) 
                            tim.stop();
-                       }
+                       
                     }
                 });
                 
@@ -179,13 +189,18 @@ public class frmPrincipal extends JFrame {
         panel.add(txtPostfix, "cell 1 9,grow");
         panel.add(button, "cell 0 11,aligny baseline");
         
-        JPanel panel_1 = new JPanel();
+        panel_1 = new JPanel();
         panel_1.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         panel_1.setBounds(301, 12, 259, 373);
         getContentPane().add(panel_1);
         panel_1.setLayout(null);
         
         btnMostrarLista = new JButton("Mostrar");
+        btnMostrarLista.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                
+            }
+        });
         btnMostrarLista.setBounds(133, 34, 114, 25);
         panel_1.add(btnMostrarLista);
         
@@ -193,7 +208,7 @@ public class frmPrincipal extends JFrame {
         btnOrdenar.setBounds(133, 66, 114, 25);
         panel_1.add(btnOrdenar);
         
-        JLabel lblOperaes = new JLabel("Operações:");
+        lblOperaes = new JLabel("Operações:");
         lblOperaes.setBounds(12, 39, 100, 15);
         panel_1.add(lblOperaes);
         
