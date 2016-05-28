@@ -16,6 +16,7 @@
 
 
 **pontos ruins**:
+
 -o código tá mal organizado, eu nunca programei em java antes, a sintaxe é parecida com c# com umas diferenças, internet ajuda.
 gerar 1000000 itens consome em torno de 50mb e cresce se você tentar gerar novamente (memory leak? é culpa do garbage collector, eu deleto a instancia anterior da lista de nomes!)
 
