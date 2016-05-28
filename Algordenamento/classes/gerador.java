@@ -23,18 +23,27 @@ public class gerador implements Runnable{
     private modos Modo; 
     private int tamanho; 
     private String prefixo; 
+    private String pad;
     private String posfixo;
     private boolean concluido;
+    private boolean fixo;
     
     /**
      * prepara o worker
      **/
-    public gerador(boolean repetir, modos Modo, int tamanho, String prefixo, String posfixo) {
+    public gerador(boolean repetir,boolean fixo, modos Modo, int tamanho, String prefixo, String posfixo) {
         this.repetir = repetir;
         this.Modo = Modo;
         this.tamanho = tamanho;
+        
+        pad = new String("");;
+        if (fixo)
+            //cria X numeros de zeros
+            pad = new String(new char[prefixo.length()+String.valueOf(tamanho).length()-1]).replace('\0', '0');
+        
         this.prefixo = prefixo;
         this.posfixo = posfixo;
+        this.fixo = fixo;
     }
     
     /**
@@ -73,20 +82,42 @@ public class gerador implements Runnable{
         switch (Modo){
         case aleatoria:
             
-            //numeros aleatorios são gerados on-the-fly
+            //aqui os numeros aleatorios são gerados on-the-fly
             if (repetir) {
-                for (int i=0; i<tamanho;i++) {
-                    nomes[i] = prefixo + ((int)(Math.random() * tamanho)) + posfixo;
-                    
-                    processado++;
+                
+                //porquê do codigo repetido:
+                //existe é mais simples que contornar um bug onde o pad tem uma length
+                //menor que o temp, e também usa menos processamento se não for fixo
+                if (fixo) {
+                    String temp;
+                    for (int i=0; i<tamanho;i++) {
+                        temp = ((int)(Math.random() * tamanho)) + posfixo;
+                        nomes[i] = prefixo + pad.substring(temp.length()) + temp;
+                        
+                        processado++;
+                    }
                 }
+                else {
+                    for (int i=0; i<tamanho;i++) {
+                        nomes[i] = prefixo + ((int)(Math.random() * tamanho)) + posfixo;
+                        
+                        processado++;
+                    }
+                } 
             }
-            
-            //uma lista é gerada e então embaralhada, leva o dobro de operações
+            //aqui uma lista é gerada e então embaralhada, leva o dobro de operações
             else {
-                for (int i=0; i<tamanho;i++) {
-                    nomes[i] = prefixo + i + posfixo;
-                    processado++;
+                if (fixo) {
+                    for (int i=0; i<tamanho;i++) {
+                        nomes[i] = prefixo + pad.substring(String.valueOf(i).length()+posfixo.length())+ i + posfixo;
+                        processado++;
+                    }
+                }
+                else {
+                    for (int i=0; i<tamanho;i++) {
+                        nomes[i] = prefixo + i + posfixo;
+                        processado++;
+                    }
                 }
                 String temp;
                 int indice;

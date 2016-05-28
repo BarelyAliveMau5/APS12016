@@ -1,6 +1,5 @@
 package forms;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -17,10 +16,7 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTextPane;
-
 import java.awt.event.ItemListener;
-import java.util.Arrays;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -33,8 +29,6 @@ import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.JTextArea;
-import javax.swing.DropMode;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
@@ -179,6 +173,7 @@ public class frmPrincipal extends JFrame {
                 //quando não é permitido repetições, acontece o dobro de operações.
                 pbProgresso.setMaximum(cbRepeat.isSelected() ? tamanho : tamanho * 2);
                 ger = new gerador(cbRepeat.isSelected(), 
+                        chckbxTamanhoFixo.isSelected(),
                         modos.aleatoria, 
                         tamanho, 
                         txtPrefix.getText(),
@@ -226,8 +221,9 @@ public class frmPrincipal extends JFrame {
         btnMostrarLista = new JButton("Mostrar");
         btnMostrarLista.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                
-                //a unica forma que eu consegui fazer isso adicionar coisas na lista..
+                //a unica forma que eu consegui fazer isso adicionar coisas na lista
+                //o eclipse gerou esse codigo, eu não sei ao certo como funciona.
+                //parece uma chamada implicita nos metodos getSize e getElementAt
                 lstNomes.setModel(new AbstractListModel<String>() {
                     String[] values = ger.getNomes();
                     public int getSize() {
@@ -237,7 +233,6 @@ public class frmPrincipal extends JFrame {
                         return values[index];
                     }
                 });
-                
             }
         });
         btnMostrarLista.setBounds(133, 34, 114, 25);
