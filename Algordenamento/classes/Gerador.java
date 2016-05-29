@@ -122,6 +122,7 @@ public class Gerador extends BaseT implements Runnable
                 // é mais simples que contornar um bug onde o pad tem uma length
                 // menor que o temp, e também usa menos processamento se não for
                 // fixo, usar IFs dentro de loops é lento.
+                a_ser_processado = tamanho;
                 if (fixo)
                 {
                     String temp;
@@ -142,6 +143,7 @@ public class Gerador extends BaseT implements Runnable
             // aqui uma lista é gerada e então embaralhada, leva o dobro de operações
             else
             {
+                a_ser_processado = tamanho *2;
                 if (fixo) 
                 {
                     for (int i = 0; i < tamanho; i++){
@@ -181,6 +183,7 @@ public class Gerador extends BaseT implements Runnable
 
         case inversa:
             // mesmo esquema dito acima sobre o bug do pad e otimização extra
+            a_ser_processado = tamanho;
             if (fixo)
             {
                 for (int i = tamanho; i > 0; i--){

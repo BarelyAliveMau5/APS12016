@@ -13,61 +13,64 @@ public class Heap extends BaseT implements Runnable
 
     private void heapSort()
     {
-        int count = nomes.length;
+        int total = nomes.length;
 
+        concluido = false;
         //primeiro colocar a na ordem do max-heap
-        heapify(count);
+        heapificar(total);
 
-        int end = count - 1;
-        while (end > 0)
+        int fim = total - 1;
+        a_ser_processado = fim;
+        while (fim > 0)
         {
             //trocar o root(maximum value) da heap com o ultimo elemento da heap
-            String tmp = nomes[end];
-            nomes[end] = nomes[0];
+            String tmp = nomes[fim];
+            nomes[fim] = nomes[0];
             nomes[0] = tmp;
             //colocar o heap de volta na ordem do max-heap
-            siftDown(0, end - 1);
+            siftDown(0, fim - 1);
             // diminuir o tamanho da heap, assim os valores maximos anteriores
             //continuarão no seu devido lugar
             processado++;
-            end--;
+            fim--;
         }
+        concluido = true;
     }
 
-    private void heapify(int count)
+    private void heapificar(int total)
     {
         //começar definindo o indice no a do ultimo nodo pai
-        int start = (count - 2) / 2; // heap binario
+        int inicio = (total - 2) / 2; // heap binario
 
-        while (start >= 0)
+        while (inicio >= 0)
         {
             // sift down the node at index start to the proper place
             // such that all nodes below the start index are in heap
             // order
-            siftDown(start, count - 1);
-            start--;
+            siftDown(inicio, total - 1);
+            inicio--;
         }
         // after sifting down the root all nodes/elements are in heap order
     }
 
-    private void siftDown(int start, int end)
+    private void siftDown(int inicio, int fim)
     {
         // end represents the limit of how far down the heap to sift
-        int root = start;
+        int raiz = inicio;
 
-        while ((root * 2 + 1) <= end)
+        while ((raiz * 2 + 1) <= fim)
         { // While the root has at least one child
-            int child = root * 2 + 1; // root*2+1 points to the left child
+            int filho = raiz * 2 + 1; // root*2+1 points to the left child
             // if the child has a sibling and the child's value is less than its
             // sibling's...
-            if (child + 1 <= end && nomes[child].compareTo(nomes[child + 1]) < 0)
-                child = child + 1; // ... then point to the right child instead
-            if (nomes[root].compareTo(nomes[child]) < 0)
+            if (filho + 1 <= fim && nomes[filho].compareTo(nomes[filho + 1]) < 0)
+                filho = filho + 1; // ... then point to the right child instead
+            if (nomes[raiz].compareTo(nomes[filho]) < 0)
             { // out of max-heap order
-                String tmp = nomes[root];
-                nomes[root] = nomes[child];
-                nomes[child] = tmp;
-                root = child; // repeat to continue sifting down the child now
+                String tmp = nomes[raiz];
+                nomes[raiz] = nomes[filho];
+                nomes[filho] = tmp;
+                raiz = filho; // repeat to continue sifting down the child now
             } else
                 return;
         }

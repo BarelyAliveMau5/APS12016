@@ -11,9 +11,13 @@ public class Insertion extends BaseT implements Runnable
     
     public void insertion_sort()
     {
-        int i, j;
+        int i, j, total = nomes.length;
+        
+        concluido = false;
+        a_ser_processado = total;
+        
         String temp;
-        for (i = 1; i < nomes.length; i++)
+        for (i = 1; i < total; i++)
         {
             j = i;
             temp = nomes[i];
@@ -25,6 +29,7 @@ public class Insertion extends BaseT implements Runnable
             nomes[j] = temp;
             processado++;
         }
+        concluido = true;
     }
 
     @Override

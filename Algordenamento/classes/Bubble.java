@@ -8,13 +8,15 @@ public class Bubble extends BaseT implements Runnable
         processado = 0;
     }
     
-    public void bubble_srt()
+    public void bubble_sort()
     {
-        int n = nomes.length;
+        int total = nomes.length;
+        concluido = false;
+        a_ser_processado = total;
         String temp;
-        for (int j = n; j >= 0; j--)
+        for (int j = total; j >= 0; j--)
         {
-            for (int i = 0; i < n - 1; i++)
+            for (int i = 0; i < total - 1; i++)
             {
                 if (nomes[i].compareTo(nomes[j]) < 0)
                 {
@@ -25,11 +27,12 @@ public class Bubble extends BaseT implements Runnable
             }
             processado++;
         }
+        concluido = true;
     }
 
     @Override
     public void run()
     {
-        bubble_srt();
+        bubble_sort();
     }
 }
