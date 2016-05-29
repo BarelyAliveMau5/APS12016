@@ -1,13 +1,10 @@
 package classes;
 
 /**
- * essa classe gera os nomes aleatorios pros arquivos; eutinha em mente criar
- * mais opções, como lista de caracteres e tals, mas ia dar trabalho demais, e
- * com o tempo escasso isso iria atrapalhar mais do que dar nota.
+ * essa classe gera os nomes aleatorios pros supostos arquivos.
  **/
 public class Gerador extends BaseT implements Runnable
 {
-    // operações realizadas. ao invez de porcentagem, que é mais lento
     public enum modos
     {
         aleatoria, 
@@ -16,8 +13,7 @@ public class Gerador extends BaseT implements Runnable
         pouca_variacao
     }
 
-    // se é ou não permitido repetir (no caso, usar somente numeros aleatorios,
-    // porque podem repetir)
+    // se é ou não permitido repetir nomes
     private boolean repetir;
     private modos Modo;
 
@@ -25,11 +21,9 @@ public class Gerador extends BaseT implements Runnable
     private int tamanho;
     private String prefixo;
 
-    // pad é uma String com zeros (do tamanho dos digitos+length do prefixo)
-    // usados pra alinhar
+    // pad é uma String com zeros usados pra alinhar, se fixo for true
     private String pad;
     private String posfixo;
-    private boolean concluido;
     private boolean fixo;
 
     /**
@@ -42,9 +36,8 @@ public class Gerador extends BaseT implements Runnable
         this.tamanho = tamanho;
 
         pad = new String("");
-        ;
+        // cria X numeros de zeros
         if (fixo)
-            // cria X numeros de zeros
             pad = new String(new char[prefixo.length() + String.valueOf(tamanho).length() - 1]).replace('\0', '0');
 
         this.prefixo = prefixo;
@@ -77,43 +70,71 @@ public class Gerador extends BaseT implements Runnable
     }
     
     /**
-     * gera a lista de nomes usnado os atributos
+     * gera numeros aleatorios, somewhat otimizado
+     **/
+    private int Randy(int[] preset)
+    {
+        //essa função seria uma lambda se java7 tivesse isso -_-
+        //é crucial que seja otimizado, como é usado em loops.
+        if (preset == null)
+            return ((int) (Math.random() * tamanho));
+        else
+        {
+            return preset[(int) (Math.random() * preset.length)];
+        }
+    }
+    
+    /**
+     * gera a lista de nomes usando os atributos inicializados no Constructor
      **/
     public void Gerar()
     {
         nomes = new String[tamanho];
         concluido = false;
         processado = 0;
+        int[] buffer = null; //TEM QUE INICIAR NULO
+        
         switch (Modo)
         {
+        case pouca_variacao:
+            //o divisor controla a proporção de repetições.
+            //quanto maior o divisor, mais repetições.
+             buffer = new int[tamanho>1000?   tamanho/100 : 
+                             (tamanho>10?     tamanho/10  : 4)];
+            
+            for (int i=0;i<buffer.length;i++)
+                buffer[i] = Randy(null);
+                
+        // FALL THROUGHT INTENCIONAL!!
+        // buffer TEM QUE SER nulo se não for passar pelo codigo acima.
+        // Randy(buffer) com buffer null é intencional para esta logica
+        // só assim tudo acontece como deve, sem eu precisar reescrever codigo
+        case semi_aleatoria:
+        // FALL THROUGHT INTENCIONAL!!
+        // a variavel uTamanho lida com isso, pra evitar reescrever
+        // o mesmo codigo. leia com cautela o código, ele é autoexplicativo
         case aleatoria:
 
             // aqui os numeros aleatorios são gerados on-the-fly
             if (repetir)
             {
-
                 // porquê do codigo repetido:
                 // é mais simples que contornar um bug onde o pad tem uma length
                 // menor que o temp, e também usa menos processamento se não for
-                // fixo
+                // fixo, usar IFs dentro de loops é lento.
                 if (fixo)
                 {
                     String temp;
-                    for (int i = 0; i < tamanho; i++)
-                    {
-                        temp = ((int) (Math.random() * tamanho)) + posfixo;
-
-                        // o metodo substring exclui os primeiros temp.length()
-                        // caracteres
+                    for (int i = 0; i < tamanho; i++) {
+                        temp = Randy(buffer) + posfixo;
                         nomes[i] = prefixo + pad.substring(temp.length()) + temp;
                         processado++;
                     }
-                } else
+                } 
+                else 
                 {
-                    // metodo original, antes da frescura do tamanho fixo..
-                    for (int i = 0; i < tamanho; i++)
-                    {
-                        nomes[i] = prefixo + ((int) (Math.random() * tamanho)) + posfixo;
+                    for (int i = 0; i < tamanho; i++) {
+                        nomes[i] = prefixo + Randy(buffer) + posfixo;
                         processado++;
                     }
                 }
@@ -123,63 +144,58 @@ public class Gerador extends BaseT implements Runnable
             {
                 if (fixo) 
                 {
-                    for (int i = 0; i < tamanho; i++)
-                    {
-                        // não simplifique mais do que isso, é inutil
+                    for (int i = 0; i < tamanho; i++){
                         nomes[i] = prefixo + pad.substring(String.valueOf(i).length() + posfixo.length()) + i + posfixo;
                         processado++;
                     }
                 } 
                 else
                 {
-                    for (int i = 0; i < tamanho; i++)
-                    {
+                    for (int i = 0; i < tamanho; i++) {
                         nomes[i] = prefixo + i + posfixo;
                         processado++;
                     }
                 }
-                // só usado pra trocar indices dos lugares
-                String temp;
+                
+                // trocar indices dos lugares
+                // caso seja semi-aleatoria, embaralhar parcialmente
+                String strTroca;
                 int indice;
-                for (int i = 0; i < tamanho; i++)
+                int uTamanho = tamanho;
+                
+                //evitar merda de usuario
+                if (tamanho > 10)
+                    if (Modo == modos.semi_aleatoria)
+                        uTamanho = uTamanho / 10;
+                
+                for (int i = 0; i < uTamanho; i++)
                 {
-                    // pega um indice valido aleatorio
-                    indice = ((int) (Math.random() * tamanho)) % tamanho;
-
+                    indice = Randy(buffer);
                     // inverte com o valor da posição aleatoria
-                    temp = nomes[i];
+                    strTroca = nomes[i];
                     nomes[i] = nomes[indice];
-                    nomes[indice] = temp;
-                    processado++;
+                    nomes[indice] = strTroca;
                 }
             }
-            break;
-
-        case semi_aleatoria:
             break;
 
         case inversa:
             // mesmo esquema dito acima sobre o bug do pad e otimização extra
             if (fixo)
             {
-                for (int i = tamanho; i > 0; i--)
-                {
-                    nomes[tamanho - i] = prefixo + pad.substring(String.valueOf(i).length() + posfixo.length()) + i
-                            + posfixo;
+                for (int i = tamanho; i > 0; i--){
+                    nomes[tamanho-i] = prefixo + pad.substring(String.valueOf(i).length() + posfixo.length()) + i + posfixo;
                     processado++;
                 }
             } else
             {
-                for (int i = tamanho; i > 0; i--)
-                {
-                    nomes[tamanho - i] = prefixo + i + posfixo;
+                for (int i = tamanho; i > 0; i--){
+                    nomes[tamanho-i] = prefixo + i + posfixo;
                     processado++;
                 }
             }
             break;
 
-        case pouca_variacao:
-            break;
         default:
             break;
         }
