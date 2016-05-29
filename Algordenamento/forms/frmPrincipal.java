@@ -12,6 +12,9 @@ import javax.swing.border.EtchedBorder;
 
 import classes.Gerador;
 import classes.Gerador.modos;
+import classes.Log.estilos;
+import classes.Profiler;
+import classes.Log;
 import net.miginfocom.swing.MigLayout;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -33,6 +36,7 @@ import javax.swing.JList;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTextPane;
+import javax.swing.JEditorPane;
 
 public class frmPrincipal extends JFrame
 {
@@ -48,7 +52,7 @@ public class frmPrincipal extends JFrame
     private JButton         btnGerar;
     private JTextField      txtPrefix;
     private JTextField      txtPostfix;
-    private JTextPane       txtLog;
+    private JEditorPane       txtLog;
     private JRadioButton    rbRandom;
     private JRadioButton    rbSemiRandom;
     private JRadioButton    rbLowVariation;
@@ -66,6 +70,28 @@ public class frmPrincipal extends JFrame
     private ButtonGroup     bg;
     private Gerador         ger;
     private Timer           tim;
+    private Log             log;
+    private Profiler        contador;
+    
+    /**
+     * escreve um texto formatado na caixa de texto jtp
+     */
+    private void logEvt(String msg,JEditorPane jtp,estilos Estilo)
+    {
+        log.msg(msg ,Estilo);
+        jtp.setText(log.getLog());
+    }
+    
+    /**
+     * modifica todos os controles do usuário de uma só vez
+     */
+    private void TravarControles(boolean estado)
+    {
+        btnGerar.setEnabled(estado);
+        btnMostrarLista.setEnabled(estado);
+        btnOrdenar.setEnabled(estado);
+        cbAlgoritimo.setEnabled(estado);
+    }
     /**
      * Launch the application.
      */
@@ -96,7 +122,9 @@ public class frmPrincipal extends JFrame
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 574, 560);
         getContentPane().setLayout(null);
-
+        
+        log = new Log();
+        
         panel = new JLayeredPane();
         panel.setBounds(12, 12, 277, 373);
         panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -163,7 +191,6 @@ public class frmPrincipal extends JFrame
         btnGerar = new JButton("Gerar lista");
         btnGerar.setToolTipText("Produzir nomes de acordo com as especificações oferecidas");
 
-
         txtPostfix = new JTextField();
         txtPostfix.setText(".jpg");
         txtPostfix.setColumns(10);
@@ -217,62 +244,79 @@ public class frmPrincipal extends JFrame
 
         pbProgresso = new JProgressBar();
         pbProgresso.setToolTipText("Progresso da operação atual");
-        pbProgresso.setBounds(12, 397, 441, 13);
+        pbProgresso.setBounds(12, 397, 472, 13);
         getContentPane().add(pbProgresso);
 
         lblPorcento = new JLabel("0");
         lblPorcento.setToolTipText("Número de operações realizadas na lista de nomes virtual");
         lblPorcento.setHorizontalAlignment(SwingConstants.CENTER);
-        lblPorcento.setBounds(471, 397, 89, 15);
+        lblPorcento.setBounds(488, 397, 72, 15);
         getContentPane().add(lblPorcento);
         
         scrLog = new JScrollPane();
         scrLog.setBounds(12, 422, 548, 100);
         getContentPane().add(scrLog);
         
-        txtLog = new JTextPane();
+        txtLog = new JEditorPane();
+        txtLog.setContentType("text/html");
         txtLog.setEditable(false);
         scrLog.setViewportView(txtLog);
 
-        /**
-         * se dsativar as repetições, mudar de opção se for baixa variação.
-         * pq se vai ter baixa variação é porque existem itens repetidos, duh
-         ***/
-        cbRepeat.addItemListener(new ItemListener()
-        {
-            public void itemStateChanged(ItemEvent arg0)
-            {
-                if (!cbRepeat.isSelected())
+        rbSemiRandom.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (rbSemiRandom.isSelected())
                 {
-                    if (rbLowVariation.isSelected())
-                        rbRandom.setSelected(true);
-                    rbLowVariation.setEnabled(false);
-                } 
-                else
-                    rbLowVariation.setEnabled(true);
-                
-            }
-        });
-        
-        /**
-         * desativa o checkbox de repetição
-         ***/
-        rbInverse.addChangeListener(new ChangeListener()
-        {
-            public void stateChanged(ChangeEvent arg0)
-            {
-
-                // não dá pra ser aleatorio e inverso..
-                if (rbInverse.isSelected())
                     cbRepeat.setEnabled(false);
-
+                    cbRepeat.setSelected(false);
+                }
                 else
                     cbRepeat.setEnabled(true);
             }
         });
         
         /**
-         * óh botão que gera os nomes, e tem memory leak
+         * marcar a caixa pra permitir repetições
+         ***/
+        rbLowVariation.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                if (rbLowVariation.isSelected())
+                    cbRepeat.setSelected(true);
+            }
+        });
+        
+        /**
+         * se desativar as repetições, isso muda de opção se for "pouca variação".
+         * se vai ter baixa variação, é porque existem itens repetidos, duh
+         ***/
+        cbRepeat.addItemListener(new ItemListener()
+        {
+            public void itemStateChanged(ItemEvent arg0)
+            {
+                if (!cbRepeat.isSelected())
+                    if (rbLowVariation.isSelected())
+                        rbRandom.setSelected(true);
+            }
+        });
+        
+        /**
+         * desativa o checkbox de repetição
+         ***/
+        rbInverse.addItemListener(new ItemListener()
+        {
+            public void itemStateChanged(ItemEvent arg0)
+            {
+                // não dá pra ser aleatorio e inverso..
+                if (rbInverse.isSelected()){
+                    cbRepeat.setEnabled(false);
+                    cbRepeat.setSelected(false);
+                }
+                else
+                    cbRepeat.setEnabled(true);
+            }
+        });
+        
+        /**
+         * óh botão que gera os nomes
          ***/
         btnGerar.addActionListener(new ActionListener()
         {
@@ -280,25 +324,26 @@ public class frmPrincipal extends JFrame
             {
                 int tamanho = Integer.valueOf(spNumItems.getValue().toString());
 
-                // quando não é permitido repetições, acontece o dobro de
-                // operações.
-                pbProgresso.setMaximum( tamanho );
-
                 modos Modo = modos.aleatoria;
                 if (rbRandom.isSelected())          Modo = modos.aleatoria;
                 if (rbInverse.isSelected())         Modo = modos.inversa;
                 if (rbLowVariation.isSelected())    Modo = modos.pouca_variacao;
                 if (rbSemiRandom.isSelected())      Modo = modos.semi_aleatoria;
 
-                ger = new Gerador(cbRepeat.isSelected(), // permitir repetições
-                        chckbxTamanhoFixo.isSelected(), // tamanho fixo
-                        Modo, // modo
-                        tamanho, // numero total de itens
-                        txtPrefix.getText(), // texto prefixo
-                        txtPostfix.getText()); // texto posfixo
-
+                ger = new Gerador(cbRepeat.isSelected(),    // permitir repetições
+                        chckbxTamanhoFixo.isSelected(),     // tamanho fixo
+                        Modo,                               // modo
+                        tamanho,                            // numero total de itens
+                        txtPrefix.getText(),                // texto prefixo
+                        txtPostfix.getText());              // texto posfixo
+                
+                //definir o numero de operações a ser processado
+                pbProgresso.setMaximum(ger.getASerProcessado());
+                
                 // talvez isso não mude muita coisa pro garbage collector..
                 ger.LimparNomes();
+                
+                contador = new Profiler();
                 
                 // gera sempre um novo timer, não sei como otimizar isso em java
                 tim = new Timer(16, new ActionListener()
@@ -313,12 +358,12 @@ public class frmPrincipal extends JFrame
                         if (ger.getConcluido())
                         {
                             tim.stop();
-                            btnGerar.setEnabled(true);
-                        } else
-                            // caso algum infeliz decida estragar as threads, NÉ
-                            // >_>
-                            btnGerar.setEnabled(false);
-
+                            TravarControles(true);
+                            logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.negrito);
+                        } 
+                        // caso algum infeliz decida estragar as threads, NÉ
+                        else 
+                            TravarControles(false);
                     }
                 });
 
@@ -338,6 +383,7 @@ public class frmPrincipal extends JFrame
                 // lista os nomes gerados
                 lstNomes.setModel(new AbstractListModel<String>()
                 {
+                    
                     String[] values = ger.getNomes();
 
                     public int getSize()

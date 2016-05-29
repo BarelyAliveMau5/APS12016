@@ -45,7 +45,7 @@ public class Profiler
         long total = tempo_atual_puro();
         if (total >= 0)
         {
-            return total + " ms:\n" + total / 60000 + "min e " + total / 1000 + " segundos.";
+            return  String.format("%.2g%n", Double.valueOf((double)total / 1000)) + " segundo(s) (" + total + "ms).";
         } else
             return "erro? lol";
     }
@@ -53,10 +53,13 @@ public class Profiler
     /***************************************
      * "para de contar" e mede o tempo total
      ****************************************/
-    public String Tempo_Final()
+    public String Tempo_Final(boolean puro)
     {
         Finalizar();
-        return Tempo_atual_bonetenho();
+        if (puro)
+            return String.valueOf(tempo_atual_puro());
+        else
+            return Tempo_atual_bonetenho();
     }
 
 }
