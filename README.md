@@ -8,7 +8,7 @@
 - permitir que se repita nomes ou não
 - tamanho fixo de nomes (e.g.: foto_0001.jpg .. foto_9999.jpg) o comprimento vai de acordo com o numero de casas.
 - a geração de nomes roda numa thread separada, assim dá pra ver o progresso sem travar o programa (ou quase sem travar.. é java lol)
-- log dos eventos ocorridos (*ainda não implementado*)
+- log dos eventos ocorridos com texto formatado
 
 
 ######pontos ruins:
