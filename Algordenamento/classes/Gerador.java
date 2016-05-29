@@ -162,7 +162,7 @@ public class Gerador extends BaseT implements Runnable
                 // trocar indices dos lugares
                 // caso seja semi-aleatoria, embaralhar parcialmente
                 String strTroca;
-                int indice;
+                int idx1, idx2;
                 int uTamanho = tamanho;
                 
                 //evitar merda de usuario
@@ -172,11 +172,12 @@ public class Gerador extends BaseT implements Runnable
                 
                 for (int i = 0; i < uTamanho; i++)
                 {
-                    indice = Randy(buffer);
+                    idx1 = Randy(buffer);
+                    idx2 = Randy(buffer);
                     // inverte com o valor da posição aleatoria
-                    strTroca = nomes[i];
-                    nomes[i] = nomes[indice];
-                    nomes[indice] = strTroca;
+                    strTroca = nomes[idx2];
+                    nomes[idx2] = nomes[idx1];
+                    nomes[idx1] = strTroca;
                 }
             }
             break;

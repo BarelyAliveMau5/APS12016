@@ -1,11 +1,15 @@
 package classes;
 
+//inspiração goo.gl/SsAhv
 public class Profiler
 {
     private long init;
     private boolean running;
     private long ending;
 
+    /**
+     * inicia a "contagem"
+     **/
     public Profiler()
     {
         if (!running)
@@ -15,7 +19,6 @@ public class Profiler
             running = true;
         }
     }
-
     public void Finalizar()
     {
         if (running)
