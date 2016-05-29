@@ -12,7 +12,8 @@ public class Log
         normal,
         negrito,
         italico,
-        underline
+        underline,
+        erro
     }
     
     public Log()
@@ -21,31 +22,32 @@ public class Log
         slog = new ByteArrayOutputStream();
         System.setOut(new PrintStream(slog));
     }
-    
-    //se java tivesse parametros pre-definidos, eu poderia usa-los
-    //ao inves de reescrever os metodos permitindo que eles sendo nulos..
-    
+
+    /**
+     * formata uma mensagem usando estilos predefinidos
+     **/
     public void msg(String message, estilos estilo)
     {
-        if (estilo != null){
         switch (estilo){
-        case normal:
-            message = "<a>" + message + "</a><br/>";
-            break;
         case negrito:
             message = "<a style='font-weight: bold;'>" + message + "</a><br/>";
             break;
         case italico:
-            message = "<a style='font-weight: italic;'>" + message + "</a><br/>";
+            message = "<a style='font-style: italic;'>" + message + "</a><br/>";
             break;
         case underline:
             message = "<a style='text-decoration: underline;'>" + message + "</a><br/>";
             break;
-            
+        case erro:
+            message = "<a style='font-weight: bold;"  + 
+                      "background-color: rgb(255,0,0);"+ 
+                      "color: rgb(255,255,255);'>" + message + "</a><br/>";
+            break;
         default:
+            message = "<a>" + message + "</a><br/>";
             break;
         }
-        }
+        
         System.out.println(message);
     }
     

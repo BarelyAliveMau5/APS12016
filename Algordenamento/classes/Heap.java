@@ -9,6 +9,7 @@ public class Heap extends BaseT implements Runnable
     {
         this.nomes = nomes;
         processado = 0;
+        a_ser_processado = nomes.length;
     }
 
     private void heapSort()
@@ -20,7 +21,6 @@ public class Heap extends BaseT implements Runnable
         heapificar(total);
 
         int fim = total - 1;
-        a_ser_processado = fim;
         while (fim > 0)
         {
             //trocar o root(maximum value) da heap com o ultimo elemento da heap

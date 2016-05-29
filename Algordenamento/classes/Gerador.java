@@ -12,7 +12,8 @@ public class Gerador extends BaseT implements Runnable
         inversa, 
         pouca_variacao
     }
-
+    private final int proporcao_semi_aleatoria = 100;
+    
     // se é ou não permitido repetir nomes
     private boolean repetir;
     private modos Modo;
@@ -45,8 +46,11 @@ public class Gerador extends BaseT implements Runnable
         this.fixo = fixo;
         
         //quando não há repetições, acontece o dobro de operações
-        if (!repetir)
+        if (!repetir && Modo != modos.inversa && Modo != modos.semi_aleatoria)
             a_ser_processado = tamanho *2;
+        //em semi_aleatoria, 10% é repetido
+        else if(Modo == modos.semi_aleatoria)
+            a_ser_processado = tamanho + (tamanho / proporcao_semi_aleatoria);
         else
             a_ser_processado = tamanho;
     }
@@ -76,7 +80,7 @@ public class Gerador extends BaseT implements Runnable
     }
     
     /**
-     * gera numeros aleatorios, somewhat otimizado
+     * gera numeros aleatorios, somewhat otimizado. inspirado no Randy Marsh
      **/
     private int Randy(int[] preset)
     {
@@ -105,8 +109,7 @@ public class Gerador extends BaseT implements Runnable
         case pouca_variacao:
             //o divisor controla a proporção de repetições.
             //quanto maior o divisor, mais repetições.
-             buffer = new int[tamanho>1000?   tamanho/100 : 
-                             (tamanho>10?     tamanho/10  : 4)];
+             buffer = new int[tamanho/proporcao_semi_aleatoria];
             
             for (int i=0;i<buffer.length;i++)
                 buffer[i] = Randy(null);
@@ -182,6 +185,7 @@ public class Gerador extends BaseT implements Runnable
                     strTroca = nomes[idx2];
                     nomes[idx2] = nomes[idx1];
                     nomes[idx1] = strTroca;
+                    processado++;
                 }
             }
             break;

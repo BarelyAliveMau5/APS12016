@@ -37,9 +37,15 @@ import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.JTextPane;
 import javax.swing.JEditorPane;
+import javax.swing.DefaultComboBoxModel;
+import classes.CtlOrdenador.ordenador;
 
 public class frmPrincipal extends JFrame
 {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private JLabel          lblOperaes;
     private JLabel          lblAleatoriedade;
     private JLabel          lblPsfixo;
@@ -223,6 +229,7 @@ public class frmPrincipal extends JFrame
         pnOrdenar.add(lblAlgoritimo);
 
         cbAlgoritimo = new JComboBox<String>();
+        cbAlgoritimo.setModel(new DefaultComboBoxModel(ordenador.values()));
         cbAlgoritimo.setToolTipText("Algoritimo de ordenação a ser usado");
         cbAlgoritimo.setBounds(133, 7, 114, 24);
         pnOrdenar.add(cbAlgoritimo);
@@ -322,6 +329,9 @@ public class frmPrincipal extends JFrame
         {
             public void actionPerformed(ActionEvent arg0)
             {
+                //inicia contagem, antes de tudo
+                contador = new Profiler();
+                
                 int tamanho = Integer.valueOf(spNumItems.getValue().toString());
 
                 modos Modo = modos.aleatoria;
@@ -329,46 +339,54 @@ public class frmPrincipal extends JFrame
                 if (rbInverse.isSelected())         Modo = modos.inversa;
                 if (rbLowVariation.isSelected())    Modo = modos.pouca_variacao;
                 if (rbSemiRandom.isSelected())      Modo = modos.semi_aleatoria;
-
-                ger = new Gerador(cbRepeat.isSelected(),    // permitir repetições
-                        chckbxTamanhoFixo.isSelected(),     // tamanho fixo
-                        Modo,                               // modo
-                        tamanho,                            // numero total de itens
-                        txtPrefix.getText(),                // texto prefixo
-                        txtPostfix.getText());              // texto posfixo
                 
-                //definir o numero de operações a ser processado
-                pbProgresso.setMaximum(ger.getASerProcessado());
-                
-                // talvez isso não mude muita coisa pro garbage collector..
-                ger.LimparNomes();
-                
-                contador = new Profiler();
-                
-                // gera sempre um novo timer, não sei como otimizar isso em java
-                tim = new Timer(16, new ActionListener()
-                {
-                    public void actionPerformed(ActionEvent arg0)
+                try {
+                    if (tamanho < 100) throw new Exception("Número abaixo do mínimo permitido");
+                    
+                    ger = new Gerador(cbRepeat.isSelected(),    // permitir repetições
+                            chckbxTamanhoFixo.isSelected(),     // tamanho fixo
+                            Modo,                               // modo
+                            tamanho,                            // numero total de itens
+                            txtPrefix.getText(),                // texto prefixo
+                            txtPostfix.getText());              // texto posfixo
+                    
+                    logEvt("Gerando lista de nomes com formato \""+ Modo.toString()+"\"",txtLog, estilos.normal);
+                    
+                    //definir o numero de operações a ser processado
+                    pbProgresso.setMaximum(ger.getASerProcessado());
+                    
+                    // talvez isso não mude muita coisa pro garbage collector..
+                    ger.LimparNomes();
+                    
+                    // gera sempre um novo timer, não sei como otimizar isso em java
+                    tim = new Timer(16, new ActionListener()
                     {
-                        int processado = ger.getProcessado();
-                        lblPorcento.setText(String.valueOf(processado));
-                        pbProgresso.setValue(processado);
-
-                        // se não parar, novos timers vão persistir
-                        if (ger.getConcluido())
+                        public void actionPerformed(ActionEvent arg0)
                         {
-                            tim.stop();
-                            TravarControles(true);
-                            logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.negrito);
-                        } 
-                        // caso algum infeliz decida estragar as threads, NÉ
-                        else 
-                            TravarControles(false);
-                    }
-                });
-
-                tim.start();
-                new Thread(ger).start();
+                            int processado = ger.getProcessado();
+                            lblPorcento.setText(String.valueOf( processado ));
+                            pbProgresso.setValue(processado);
+    
+                            // se não parar, novos timers vão persistir
+                            if (ger.getConcluido())
+                            {
+                                tim.stop();
+                                TravarControles(true);
+                                logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.negrito);
+                            } 
+                            // caso algum infeliz decida estragar as threads, NÉ
+                            else 
+                                TravarControles(false);
+                        }
+                    });
+    
+                    tim.start();
+                    new Thread(ger).start();
+                } 
+                catch (Exception er)
+                {
+                    logEvt("Erro: "+er.getMessage(),txtLog,estilos.erro);
+                }
             }
         });
 
@@ -381,9 +399,15 @@ public class frmPrincipal extends JFrame
             {
                 // modifiquei o codigo gerado pelo eclipse, assim ele insere na 
                 // lista os nomes gerados
+                logEvt("Carregando itens para a lista..",txtLog,estilos.italico);
+                
                 lstNomes.setModel(new AbstractListModel<String>()
                 {
                     
+                    /**
+                     * 
+                     */
+                    private static final long serialVersionUID = 1L;
                     String[] values = ger.getNomes();
 
                     public int getSize()
@@ -396,6 +420,7 @@ public class frmPrincipal extends JFrame
                         return values[index];
                     }
                 });
+                
             }
         });
 
