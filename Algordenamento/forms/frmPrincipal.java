@@ -32,6 +32,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.JTextPane;
 
 public class frmPrincipal extends JFrame
 {
@@ -47,6 +48,7 @@ public class frmPrincipal extends JFrame
     private JButton         btnGerar;
     private JTextField      txtPrefix;
     private JTextField      txtPostfix;
+    private JTextPane       txtLog;
     private JRadioButton    rbRandom;
     private JRadioButton    rbSemiRandom;
     private JRadioButton    rbLowVariation;
@@ -58,12 +60,12 @@ public class frmPrincipal extends JFrame
     private JLayeredPane    panel;
     private JProgressBar    pbProgresso;
     private JComboBox<String> cbAlgoritimo;
-    private JScrollPane     scrollPane;
+    private JScrollPane     scrNomes;
+    private JScrollPane     scrLog;
     private JList<String>   lstNomes;
     private ButtonGroup     bg;
     private Gerador         ger;
     private Timer           tim;
-
     /**
      * Launch the application.
      */
@@ -112,9 +114,130 @@ public class frmPrincipal extends JFrame
         bg = new ButtonGroup();
 
         cbRepeat = new JCheckBox("Permitir repetições");
+        cbRepeat.setToolTipText("Nomes podem aparecer mais de uma vez");
         cbRepeat.setSelected(true);
         panel.add(cbRepeat, "cell 0 1,alignx left,aligny top");
 
+        chckbxTamanhoFixo = new JCheckBox("Tamanho fixo");
+        chckbxTamanhoFixo.setToolTipText("O numero de caracteres em cada nome permanece o mesmo");
+        chckbxTamanhoFixo.setSelected(true);
+        panel.add(chckbxTamanhoFixo, "cell 0 2");
+
+        lblAleatoriedade = new JLabel("Aleatoriedade:");
+        panel.add(lblAleatoriedade, "cell 0 3");
+
+        rbRandom = new JRadioButton("Aleatória");
+        rbRandom.setToolTipText("Totalmente aleatório");
+        panel.add(rbRandom, "cell 0 4");
+        rbRandom.setSelected(true);
+        bg.add(rbRandom);
+
+        rbSemiRandom = new JRadioButton("Semi-aleatória");
+        rbSemiRandom.setToolTipText("Sequencia com alguns nomes fora de ordem");
+        panel.add(rbSemiRandom, "cell 0 5");
+        bg.add(rbSemiRandom);
+
+        rbInverse = new JRadioButton("Inversa");
+        rbInverse.setToolTipText("Do maior número ao menor");
+
+        panel.add(rbInverse, "cell 0 6");
+        bg.add(rbInverse);
+
+        rbLowVariation = new JRadioButton("Pouca variação");
+        rbLowVariation.setToolTipText("Muitos nomes repetidos. A opção \"Permitir repetições\" é obrigatória");
+        panel.add(rbLowVariation, "cell 0 7");
+        bg.add(rbLowVariation);
+        lblPrefixo = new JLabel("Texto prefixo:");
+        lblPrefixo.setToolTipText("Texto que vem antes da numeração");
+        panel.add(lblPrefixo, "cell 0 8,alignx left");
+
+        txtPrefix = new JTextField();
+        txtPrefix.setText("foto_");
+        panel.add(txtPrefix, "cell 1 8,grow");
+        txtPrefix.setColumns(10);
+
+        lblPsfixo = new JLabel("Texto pósfixo:");
+        lblPsfixo.setToolTipText("Texto que vem após a numeração");
+        panel.add(lblPsfixo, "cell 0 9,alignx left");
+
+        btnGerar = new JButton("Gerar lista");
+        btnGerar.setToolTipText("Produzir nomes de acordo com as especificações oferecidas");
+
+
+        txtPostfix = new JTextField();
+        txtPostfix.setText(".jpg");
+        txtPostfix.setColumns(10);
+        panel.add(txtPostfix, "cell 1 9,grow");
+        panel.add(btnGerar, "cell 0 11,aligny baseline");
+
+        pnOrdenar = new JPanel();
+        pnOrdenar.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+        pnOrdenar.setBounds(301, 12, 259, 373);
+        getContentPane().add(pnOrdenar);
+        pnOrdenar.setLayout(null);
+
+        btnMostrarLista = new JButton("Mostrar");
+        btnMostrarLista.setToolTipText("Mostrar nomes gerados na lista.");
+        
+        btnMostrarLista.setBounds(133, 34, 114, 25);
+        pnOrdenar.add(btnMostrarLista);
+
+        btnOrdenar = new JButton("Ordenar");
+        btnOrdenar.setToolTipText("Ordenar e mostrar nomes na lista");
+        btnOrdenar.setBounds(133, 66, 114, 25);
+        pnOrdenar.add(btnOrdenar);
+
+        lblOperaes = new JLabel("Operações:");
+        lblOperaes.setBounds(12, 39, 100, 15);
+        pnOrdenar.add(lblOperaes);
+
+        lblAlgoritimo = new JLabel("Algoritimo:");
+        lblAlgoritimo.setBounds(12, 12, 100, 15);
+        pnOrdenar.add(lblAlgoritimo);
+
+        cbAlgoritimo = new JComboBox<String>();
+        cbAlgoritimo.setToolTipText("Algoritimo de ordenação a ser usado");
+        cbAlgoritimo.setBounds(133, 7, 114, 24);
+        pnOrdenar.add(cbAlgoritimo);
+
+        cbAlgoritimo.setBounds(133, 7, 114, 24);
+        pnOrdenar.add(cbAlgoritimo);
+
+        cbAlgoritimo = new JComboBox<String>();
+        cbAlgoritimo.setBounds(133, 7, 114, 24);
+        pnOrdenar.add(cbAlgoritimo);
+
+        scrNomes = new JScrollPane();
+        scrNomes.setBounds(12, 98, 235, 263);
+        pnOrdenar.add(scrNomes);
+
+        lstNomes = new JList<String>();
+        lstNomes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        scrNomes.setViewportView(lstNomes);
+
+        pbProgresso = new JProgressBar();
+        pbProgresso.setToolTipText("Progresso da operação atual");
+        pbProgresso.setBounds(12, 397, 441, 13);
+        getContentPane().add(pbProgresso);
+
+        lblPorcento = new JLabel("0");
+        lblPorcento.setToolTipText("Número de operações realizadas na lista de nomes virtual");
+        lblPorcento.setHorizontalAlignment(SwingConstants.CENTER);
+        lblPorcento.setBounds(471, 397, 89, 15);
+        getContentPane().add(lblPorcento);
+        
+        scrLog = new JScrollPane();
+        scrLog.setBounds(12, 422, 548, 100);
+        getContentPane().add(scrLog);
+        
+        txtLog = new JTextPane();
+        txtLog.setEditable(false);
+        scrLog.setViewportView(txtLog);
+
+        /**
+         * se dsativar as repetições, mudar de opção se for baixa variação.
+         * pq se vai ter baixa variação é porque existem itens repetidos, duh
+         ***/
         cbRepeat.addItemListener(new ItemListener()
         {
             public void itemStateChanged(ItemEvent arg0)
@@ -124,30 +247,16 @@ public class frmPrincipal extends JFrame
                     if (rbLowVariation.isSelected())
                         rbRandom.setSelected(true);
                     rbLowVariation.setEnabled(false);
-                } else
-                {
+                } 
+                else
                     rbLowVariation.setEnabled(true);
-                }
+                
             }
         });
-
-        chckbxTamanhoFixo = new JCheckBox("Tamanho fixo");
-        chckbxTamanhoFixo.setSelected(true);
-        panel.add(chckbxTamanhoFixo, "cell 0 2");
-
-        lblAleatoriedade = new JLabel("Aleatoriedade:");
-        panel.add(lblAleatoriedade, "cell 0 3");
-
-        rbRandom = new JRadioButton("Aleatória");
-        panel.add(rbRandom, "cell 0 4");
-        rbRandom.setSelected(true);
-        bg.add(rbRandom);
-
-        rbSemiRandom = new JRadioButton("Semi-aleatória");
-        panel.add(rbSemiRandom, "cell 0 5");
-        bg.add(rbSemiRandom);
-
-        rbInverse = new JRadioButton("Inversa");
+        
+        /**
+         * desativa o checkbox de repetição
+         ***/
         rbInverse.addChangeListener(new ChangeListener()
         {
             public void stateChanged(ChangeEvent arg0)
@@ -161,24 +270,10 @@ public class frmPrincipal extends JFrame
                     cbRepeat.setEnabled(true);
             }
         });
-        panel.add(rbInverse, "cell 0 6");
-        bg.add(rbInverse);
-
-        rbLowVariation = new JRadioButton("Pouca variação");
-        panel.add(rbLowVariation, "cell 0 7");
-        bg.add(rbLowVariation);
-        lblPrefixo = new JLabel("Texto prefixo:");
-        panel.add(lblPrefixo, "cell 0 8,alignx left");
-
-        txtPrefix = new JTextField();
-        txtPrefix.setText("foto_");
-        panel.add(txtPrefix, "cell 1 8,grow");
-        txtPrefix.setColumns(10);
-
-        lblPsfixo = new JLabel("Texto pósfixo:");
-        panel.add(lblPsfixo, "cell 0 9,alignx left");
-
-        btnGerar = new JButton("Gerar lista");
+        
+        /**
+         * óh botão que gera os nomes, e tem memory leak
+         ***/
         btnGerar.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent arg0)
@@ -204,7 +299,7 @@ public class frmPrincipal extends JFrame
 
                 // talvez isso não mude muita coisa pro garbage collector..
                 ger.LimparNomes();
-
+                
                 // gera sempre um novo timer, não sei como otimizar isso em java
                 tim = new Timer(16, new ActionListener()
                 {
@@ -232,29 +327,15 @@ public class frmPrincipal extends JFrame
             }
         });
 
-        txtPostfix = new JTextField();
-        txtPostfix.setText(".jpg");
-        txtPostfix.setColumns(10);
-        panel.add(txtPostfix, "cell 1 9,grow");
-        panel.add(btnGerar, "cell 0 11,aligny baseline");
-
-        pnOrdenar = new JPanel();
-        pnOrdenar.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-        pnOrdenar.setBounds(301, 12, 259, 373);
-        getContentPane().add(pnOrdenar);
-        pnOrdenar.setLayout(null);
-
-        btnMostrarLista = new JButton("Mostrar");
+        /**
+         * mostrar as coisas na lista
+         ***/
         btnMostrarLista.addActionListener(new ActionListener()
         {
             public void actionPerformed(ActionEvent arg0)
             {
-                // a unica forma que eu consegui fazer isso adicionar coisas na
-                // lista
-                // o eclipse gerou esse codigo, eu não sei ao certo como
-                // funciona.
-                // parece uma chamada implicita nos metodos getSize e
-                // getElementAt
+                // modifiquei o codigo gerado pelo eclipse, assim ele insere na 
+                // lista os nomes gerados
                 lstNomes.setModel(new AbstractListModel<String>()
                 {
                     String[] values = ger.getNomes();
@@ -271,48 +352,6 @@ public class frmPrincipal extends JFrame
                 });
             }
         });
-        btnMostrarLista.setBounds(133, 34, 114, 25);
-        pnOrdenar.add(btnMostrarLista);
-
-        btnOrdenar = new JButton("Ordenar");
-        btnOrdenar.setBounds(133, 66, 114, 25);
-        pnOrdenar.add(btnOrdenar);
-
-        lblOperaes = new JLabel("Operações:");
-        lblOperaes.setBounds(12, 39, 100, 15);
-        pnOrdenar.add(lblOperaes);
-
-        lblAlgoritimo = new JLabel("Algoritimo:");
-        lblAlgoritimo.setBounds(12, 12, 100, 15);
-        pnOrdenar.add(lblAlgoritimo);
-
-        cbAlgoritimo = new JComboBox<String>();
-        cbAlgoritimo.setBounds(133, 7, 114, 24);
-        pnOrdenar.add(cbAlgoritimo);
-
-        cbAlgoritimo.setBounds(133, 7, 114, 24);
-        pnOrdenar.add(cbAlgoritimo);
-
-        cbAlgoritimo = new JComboBox<String>();
-        cbAlgoritimo.setBounds(133, 7, 114, 24);
-        pnOrdenar.add(cbAlgoritimo);
-
-        scrollPane = new JScrollPane();
-        scrollPane.setBounds(12, 98, 235, 263);
-        pnOrdenar.add(scrollPane);
-
-        lstNomes = new JList<String>();
-        lstNomes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        scrollPane.setViewportView(lstNomes);
-
-        pbProgresso = new JProgressBar();
-        pbProgresso.setBounds(12, 397, 441, 13);
-        getContentPane().add(pbProgresso);
-
-        lblPorcento = new JLabel("0");
-        lblPorcento.setHorizontalAlignment(SwingConstants.CENTER);
-        lblPorcento.setBounds(471, 397, 89, 15);
-        getContentPane().add(lblPorcento);
 
     }
 }
