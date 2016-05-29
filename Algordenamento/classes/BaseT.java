@@ -20,7 +20,7 @@ public abstract class BaseT
     }
     public int getASerProcessado()
     {
-        return processado;
+        return a_ser_processado;
     }
     
 }
