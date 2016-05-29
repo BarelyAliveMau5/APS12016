@@ -282,7 +282,7 @@ public class frmPrincipal extends JFrame
 
                 // quando não é permitido repetições, acontece o dobro de
                 // operações.
-                pbProgresso.setMaximum(cbRepeat.isSelected() ? tamanho : tamanho * 2);
+                pbProgresso.setMaximum( tamanho );
 
                 modos Modo = modos.aleatoria;
                 if (rbRandom.isSelected())          Modo = modos.aleatoria;
