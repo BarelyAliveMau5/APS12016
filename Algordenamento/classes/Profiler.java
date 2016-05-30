@@ -45,7 +45,10 @@ public class Profiler
         long total = tempo_atual_puro();
         if (total >= 0)
         {
-            return  String.format("%.2g%n", Double.valueOf((double)total / 1000)) + " segundo(s) (" + total + "ms).";
+            if (total < 60000)
+                return  String.format("%.2g%n", (double)total / 1000) + " segundo(s) (" + total + "ms).";
+            else
+                return  String.valueOf(total / 60000)+"min e " + String.format("%.2g%n", ((double)total / 1000) % 60) + " segundo(s) (" + total + "ms).";
         } else
             return "erro? lol";
     }
