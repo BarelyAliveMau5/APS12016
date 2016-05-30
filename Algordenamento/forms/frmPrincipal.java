@@ -30,12 +30,9 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.JList;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
-import javax.swing.JTextPane;
 import javax.swing.JEditorPane;
 import javax.swing.DefaultComboBoxModel;
 
@@ -232,7 +229,7 @@ public class frmPrincipal extends JFrame
         pnOrdenar.add(lblAlgoritimo);
 
         cbAlgoritimo = new JComboBox<ordenador>();
-        cbAlgoritimo.setModel(new DefaultComboBoxModel(ordenador.values()));
+        cbAlgoritimo.setModel(new DefaultComboBoxModel<ordenador>(ordenador.values()));
         cbAlgoritimo.setToolTipText("Algoritimo de ordenação a ser usado");
         cbAlgoritimo.setBounds(133, 7, 114, 24);
         pnOrdenar.add(cbAlgoritimo);
