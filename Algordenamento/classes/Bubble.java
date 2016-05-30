@@ -8,8 +8,6 @@ public class Bubble extends BaseT implements Runnable
         processado = 0;
     }
     
-    //fonte:
-    //http://stackoverflow.com/questions/16195092/optimized-bubble-sort-java
     public void bubble_sort()
     {
         int total = nomes.length;
