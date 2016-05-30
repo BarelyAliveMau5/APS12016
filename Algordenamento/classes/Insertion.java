@@ -28,6 +28,7 @@ public class Insertion extends BaseT implements Runnable
             nomes[j] = temp;
             processado++;
         }
+        processado++;
         concluido = true;
     }
 
