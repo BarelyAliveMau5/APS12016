@@ -15,6 +15,9 @@ public class CtlOrdenador extends BaseT
         Insertion_sort,
     }
     
+    /**
+     * cria uma instancia da classe do algoritimo usando o BaseT como base
+     **/
     public CtlOrdenador(String[] nomes, ordenador algoritimo) throws Exception
     {
         this.a_ser_processado = nomes.length;
