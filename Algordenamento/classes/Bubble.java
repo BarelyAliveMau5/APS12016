@@ -8,25 +8,33 @@ public class Bubble extends BaseT implements Runnable
         processado = 0;
     }
     
+    //fonte:
+    //http://stackoverflow.com/questions/16195092/optimized-bubble-sort-java
     public void bubble_sort()
     {
         int total = nomes.length;
         concluido = false;
         String temp;
-        for (int j = total; j >= 0; j--)
+        boolean ordenado;
+        for(int i=1; i<total; i++) 
         {
-            for (int i = 0; i < total - 1; i++)
-            {
-                if (nomes[i].compareTo(nomes[j]) < 0)
+            ordenado = true;
+            for(int j=0; j < total - i; j++) 
+            { 
+                if(nomes[j].compareTo(nomes[j+1]) >0 ) 
                 {
-                    temp = nomes[i];
-                    nomes[i] = nomes[j];
-                    nomes[j] = temp;
+                    temp = nomes[j];
+                    nomes[j] = nomes[j+1];
+                    nomes[j+1] = temp;
+                    ordenado = false;
                 }
             }
             processado++;
+            if(ordenado) break;
         }
+        processado = total;
         concluido = true;
+          
     }
 
     @Override
