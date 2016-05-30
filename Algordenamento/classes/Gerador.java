@@ -82,6 +82,7 @@ public class Gerador extends BaseT implements Runnable
             return ((int) (Math.random() * tamanho));
         else
         {
+            //lista limitada de numeros usada no semi-aleatoria
             return preset[(int) (Math.random() * preset.length)];
         }
     }
@@ -125,10 +126,8 @@ public class Gerador extends BaseT implements Runnable
                 // fixo, usar IFs dentro de loops é lento.
                 if (fixo)
                 {
-                    String temp;
                     for (int i = 0; i < tamanho; i++) {
-                        temp = Randy(buffer) + posfixo;
-                        nomes[i] = prefixo + pad.substring(temp.length()) + temp;
+                        nomes[i] = prefixo + pad.substring(temp.length()) + Randy(buffer) + posfixo;;
                         processado++;
                     }
                 } 
