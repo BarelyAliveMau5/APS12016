@@ -1,7 +1,7 @@
 package classes;
 
-//fonte: http://rosettacode.org/wiki/Sorting_algorithms/Heapsort
-//modificado para aceitar String[], e traduzido do ingles
+// fonte: http://rosettacode.org/wiki/Sorting_algorithms/Heapsort
+// modificado para aceitar String[], e traduzido do ingles
 
 public class Heap extends BaseT implements Runnable
 {
@@ -16,20 +16,20 @@ public class Heap extends BaseT implements Runnable
         int total = nomes.length;
 
         concluido = false;
-        //primeiro colocar a na ordem do max-heap
+        // primeiro colocar a na ordem do max-heap
         heapificar(total);
 
         int fim = total - 1;
         while (fim > 0)
         {
-            //trocar o root(maximum value) da heap com o ultimo elemento da heap
+            //trocar o root(maximum value) da heap com o ultimo elemento do monte
             String tmp = nomes[fim];
             nomes[fim] = nomes[0];
             nomes[0] = tmp;
-            //colocar o heap de volta na ordem do max-heap
+            // colocar o heap de volta na ordem do max-heap
             siftDown(0, fim - 1);
             // diminuir o tamanho da heap, assim os valores maximos anteriores
-            //continuarão no seu devido lugar
+            // continuarão no seu devido lugar
             processado++;
             fim--;
         }
@@ -38,39 +38,37 @@ public class Heap extends BaseT implements Runnable
 
     private void heapificar(int total)
     {
-        //começar definindo o indice no a do ultimo nodo pai
+        // começar definindo o indice no a do ultimo nodo pai
         int inicio = (total - 2) / 2; // heap binario
 
         while (inicio >= 0)
         {
-            // sift down the node at index start to the proper place
-            // such that all nodes below the start index are in heap
-            // order
+            // processar o nodo no indice inicial para seu devido lugar,
+            // assim todos os nodos abaixo do indice inicial estão em ordem
             siftDown(inicio, total - 1);
             inicio--;
         }
-        // after sifting down the root all nodes/elements are in heap order
+        //depois de processar a raiz, todos os nodos/elementos estão ordenados
     }
 
     private void siftDown(int inicio, int fim)
     {
-        // end represents the limit of how far down the heap to sift
+        // fim representa o limite do quão longe o monte pode ser processado
         int raiz = inicio;
 
         while ((raiz * 2 + 1) <= fim)
-        { // While the root has at least one child
-            int filho = raiz * 2 + 1; // root*2+1 points to the left child
-            // if the child has a sibling and the child's value is less than its
-            // sibling's...
+        { // enquanto a raiz tem pelo menos um filho
+            int filho = raiz * 2 + 1; // raiz*2+1 aponta para o filho da esquerda
+            // se o filho tem um irmão e o valor do filho é menor que do irmão ...
             if (filho + 1 <= fim && nomes[filho].compareTo(nomes[filho + 1]) < 0)
-                filho = filho + 1; // ... then point to the right child instead
+                filho = filho + 1; // ... então apontar para o filho da direita como alternativa
             if (nomes[raiz].compareTo(nomes[filho]) < 0)
-            { // out of max-heap order
+            { // não há odrem de max-heap
                 String tmp = nomes[raiz];
                 nomes[raiz] = nomes[filho];
                 nomes[filho] = tmp;
-                raiz = filho; // repeat to continue sifting down the child now
-            } else
+                raiz = filho; // repetir para continuar processando abaixo do filho agora
+            } else 
                 return;
         }
     }
