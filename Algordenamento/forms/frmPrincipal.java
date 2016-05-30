@@ -91,10 +91,10 @@ public class frmPrincipal extends JFrame
      */
     private void TravarControles(boolean estado)
     {
-        btnGerar.setEnabled(estado);
-        btnMostrarLista.setEnabled(estado);
-        btnOrdenar.setEnabled(estado);
-        cbAlgoritimo.setEnabled(estado);
+        btnGerar.setEnabled(!estado);
+        btnMostrarLista.setEnabled(!estado);
+        btnOrdenar.setEnabled(!estado);
+        cbAlgoritimo.setEnabled(!estado);
     }
     /**
      * Launch the application.
@@ -279,6 +279,7 @@ public class frmPrincipal extends JFrame
                     //mas são boas maneiras
                     pbProgresso.setMaximum(algor.getASerProcessado());
                     
+                    TravarControles(true);
                     tim = new Timer(100, new ActionListener()
                     {
                         public void actionPerformed(ActionEvent e)
@@ -288,15 +289,13 @@ public class frmPrincipal extends JFrame
                             if (algor.getConcluido())
                             {
                                 tim.stop();
-                                TravarControles(true);
+                                TravarControles(false);
                                 logEvt("Ordenação finalizada em " + contador.Tempo_Final(false)
                                 , txtLog, estilos.NOTICIA);
                                 
                             }
                             else
-                            {
-                                TravarControles(false);
-                            }
+                                TravarControles(true);
                         }
                     });
                     
@@ -403,6 +402,7 @@ public class frmPrincipal extends JFrame
                     // talvez isso não mude muita coisa pro garbage collector..
                     ger.LimparNomes();
                     
+                    TravarControles(true);
                     // gera sempre um novo timer, não sei como otimizar isso em java
                     tim = new Timer(16, new ActionListener()
                     {
@@ -416,12 +416,11 @@ public class frmPrincipal extends JFrame
                             if (ger.getConcluido())
                             {
                                 tim.stop();
-                                TravarControles(true);
+                                TravarControles(false);
                                 logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.NEGRITO);
                             } 
-                            // caso algum infeliz decida estragar as threads, NÉ
                             else 
-                                TravarControles(false);
+                                TravarControles(true);
                         }
                     });
     
