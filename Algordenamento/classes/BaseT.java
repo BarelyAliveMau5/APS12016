@@ -26,6 +26,14 @@ public class BaseT
     }
     
     /**
+     * pra finalizar os timers
+     **/
+    public boolean getConcluido()
+    {
+        return this.concluido;
+    }
+    
+    /**
      * getter do a_ser_processado
      **/
     public int getASerProcessado()

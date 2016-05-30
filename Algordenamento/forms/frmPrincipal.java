@@ -38,13 +38,12 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JTextPane;
 import javax.swing.JEditorPane;
 import javax.swing.DefaultComboBoxModel;
+
+import classes.CtlOrdenador;
 import classes.CtlOrdenador.ordenador;
 
 public class frmPrincipal extends JFrame
 {
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
     private JLabel          lblOperaes;
     private JLabel          lblAleatoriedade;
@@ -58,7 +57,7 @@ public class frmPrincipal extends JFrame
     private JButton         btnGerar;
     private JTextField      txtPrefix;
     private JTextField      txtPostfix;
-    private JEditorPane       txtLog;
+    private JEditorPane     txtLog;
     private JRadioButton    rbRandom;
     private JRadioButton    rbSemiRandom;
     private JRadioButton    rbLowVariation;
@@ -69,7 +68,7 @@ public class frmPrincipal extends JFrame
     private JPanel          pnOrdenar;
     private JLayeredPane    panel;
     private JProgressBar    pbProgresso;
-    private JComboBox<String> cbAlgoritimo;
+    private JComboBox<ordenador> cbAlgoritimo;
     private JScrollPane     scrNomes;
     private JScrollPane     scrLog;
     private JList<String>   lstNomes;
@@ -78,6 +77,8 @@ public class frmPrincipal extends JFrame
     private Timer           tim;
     private Log             log;
     private Profiler        contador;
+    private Thread          piao;
+    private CtlOrdenador    algor;
     
     /**
      * escreve um texto formatado na caixa de texto jtp
@@ -210,12 +211,14 @@ public class frmPrincipal extends JFrame
         pnOrdenar.setLayout(null);
 
         btnMostrarLista = new JButton("Mostrar");
+        btnMostrarLista.setEnabled(false);
         btnMostrarLista.setToolTipText("Mostrar nomes gerados na lista.");
         
         btnMostrarLista.setBounds(133, 34, 114, 25);
         pnOrdenar.add(btnMostrarLista);
-
         btnOrdenar = new JButton("Ordenar");
+
+        btnOrdenar.setEnabled(false);
         btnOrdenar.setToolTipText("Ordenar e mostrar nomes na lista");
         btnOrdenar.setBounds(133, 66, 114, 25);
         pnOrdenar.add(btnOrdenar);
@@ -228,16 +231,9 @@ public class frmPrincipal extends JFrame
         lblAlgoritimo.setBounds(12, 12, 100, 15);
         pnOrdenar.add(lblAlgoritimo);
 
-        cbAlgoritimo = new JComboBox<String>();
+        cbAlgoritimo = new JComboBox<ordenador>();
         cbAlgoritimo.setModel(new DefaultComboBoxModel(ordenador.values()));
         cbAlgoritimo.setToolTipText("Algoritimo de ordenação a ser usado");
-        cbAlgoritimo.setBounds(133, 7, 114, 24);
-        pnOrdenar.add(cbAlgoritimo);
-
-        cbAlgoritimo.setBounds(133, 7, 114, 24);
-        pnOrdenar.add(cbAlgoritimo);
-
-        cbAlgoritimo = new JComboBox<String>();
         cbAlgoritimo.setBounds(133, 7, 114, 24);
         pnOrdenar.add(cbAlgoritimo);
 
@@ -269,6 +265,58 @@ public class frmPrincipal extends JFrame
         txtLog.setEditable(false);
         scrLog.setViewportView(txtLog);
 
+        btnOrdenar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) 
+            {
+                try
+                {
+                    
+                    logEvt("Iniciando ordenação com o algoritimo "+ cbAlgoritimo.getSelectedItem().toString(), txtLog, estilos.NORMAL);
+                    
+                    contador = new Profiler();
+                    
+                    //instanciar usando item da lista com cast do ordenador
+                    algor = new CtlOrdenador(ger.getNomes(),(ordenador)cbAlgoritimo.getSelectedItem());
+                   
+                    //isso é ambiguo, sim eu sei, a quantidade não muda
+                    //mas são boas maneiras
+                    pbProgresso.setMaximum(algor.getASerProcessado());
+                    
+                    tim = new Timer(100, new ActionListener()
+                    {
+                        public void actionPerformed(ActionEvent e)
+                        {
+                            pbProgresso.setValue(algor.getProcessado());
+                            lblPorcento.setText(String.valueOf(algor.getProcessado()));
+                            if (algor.getConcluido())
+                            {
+                                tim.stop();
+                                TravarControles(true);
+                                logEvt("Ordenação finalizada em " + contador.Tempo_Final(false)
+                                , txtLog, estilos.NOTICIA);
+                                
+                            }
+                            else
+                            {
+                                TravarControles(false);
+                            }
+                        }
+                    });
+                    
+                    tim.start();
+                    algor.iniciar();
+                } 
+                catch (Exception e1)
+                {
+                    logEvt(e1.getMessage(), txtLog, estilos.ERRO);
+                    e1.printStackTrace();
+                }
+            }
+        });
+        
+        /**
+         * desmarcar a caixa pra permitir repetições
+         ***/
         rbSemiRandom.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 if (rbSemiRandom.isSelected())
@@ -350,7 +398,7 @@ public class frmPrincipal extends JFrame
                             txtPrefix.getText(),                // texto prefixo
                             txtPostfix.getText());              // texto posfixo
                     
-                    logEvt("Gerando lista de nomes com formato \""+ Modo.toString()+"\"",txtLog, estilos.normal);
+                    logEvt("Gerando lista de nomes com formato \""+ Modo.toString()+"\"",txtLog, estilos.NORMAL);
                     
                     //definir o numero de operações a ser processado
                     pbProgresso.setMaximum(ger.getASerProcessado());
@@ -372,7 +420,7 @@ public class frmPrincipal extends JFrame
                             {
                                 tim.stop();
                                 TravarControles(true);
-                                logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.negrito);
+                                logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.NEGRITO);
                             } 
                             // caso algum infeliz decida estragar as threads, NÉ
                             else 
@@ -381,11 +429,12 @@ public class frmPrincipal extends JFrame
                     });
     
                     tim.start();
-                    new Thread(ger).start();
+                    piao = new Thread(ger);
+                    piao.start();
                 } 
                 catch (Exception er)
                 {
-                    logEvt("Erro: "+er.getMessage(),txtLog,estilos.erro);
+                    logEvt("Erro: "+er.getMessage(),txtLog,estilos.ERRO);
                 }
             }
         });
@@ -399,14 +448,10 @@ public class frmPrincipal extends JFrame
             {
                 // modifiquei o codigo gerado pelo eclipse, assim ele insere na 
                 // lista os nomes gerados
-                logEvt("Carregando itens para a lista..",txtLog,estilos.italico);
+                logEvt("Itens carregados na lista",txtLog,estilos.ITALICO);
                 
                 lstNomes.setModel(new AbstractListModel<String>()
                 {
-                    
-                    /**
-                     * 
-                     */
                     private static final long serialVersionUID = 1L;
                     String[] values = ger.getNomes();
 

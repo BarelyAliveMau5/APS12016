@@ -9,11 +9,11 @@ public class Log
     
     public enum estilos
     {
-        normal,
-        negrito,
-        italico,
-        underline,
-        erro
+        NORMAL,
+        NEGRITO,
+        ITALICO,
+        NOTICIA,
+        ERRO
     }
     
     /**
@@ -31,16 +31,16 @@ public class Log
     public void msg(String message, estilos estilo)
     {
         switch (estilo){
-        case negrito:
+        case NEGRITO:
             message = "<a style='font-weight: bold;'>" + message + "</a><br/>";
             break;
-        case italico:
+        case ITALICO:
             message = "<a style='font-style: italic;'>" + message + "</a><br/>";
             break;
-        case underline:
-            message = "<a style='text-decoration: underline;'>" + message + "</a><br/>";
+        case NOTICIA:
+            message = "<a style='text-decoration: underline;font-weight: bold;'>" + message + "</a><br/>";
             break;
-        case erro:
+        case ERRO:
             message = "<a style='font-weight: bold;"  + 
                       "background-color: rgb(255,0,0);"+ 
                       "color: rgb(255,255,255);'>" + message + "</a><br/>";

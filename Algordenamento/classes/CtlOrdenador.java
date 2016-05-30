@@ -6,6 +6,7 @@ package classes;
 public class CtlOrdenador extends BaseT
 {
     private Thread t;
+    BaseT algo;
     
     public enum ordenador
     {
@@ -16,7 +17,6 @@ public class CtlOrdenador extends BaseT
     
     public CtlOrdenador(String[] nomes, ordenador algoritimo) throws Exception
     {
-        BaseT algo = null;
         this.a_ser_processado = nomes.length;
         
         switch (algoritimo)
@@ -38,6 +38,19 @@ public class CtlOrdenador extends BaseT
         }
 
         t = new Thread((Runnable) algo);
+    }
+    
+    /**
+     * lê o getProcessado da instancia polimorfica? wtf
+     **/
+    public int getProcessado()
+    {
+        return algo.getProcessado();
+    }
+    
+    public boolean getConcluido()
+    {
+        return algo.getConcluido();
     }
     
     public void iniciar()

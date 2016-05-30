@@ -64,14 +64,6 @@ public class Gerador extends BaseT implements Runnable
     }
 
     /**
-     * pra finalizar os timers
-     **/
-    public boolean getConcluido()
-    {
-        return this.concluido;
-    }
-
-    /**
      * isso muda alguma coisa?
      **/
     public void LimparNomes()
