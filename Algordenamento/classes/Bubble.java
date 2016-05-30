@@ -12,7 +12,6 @@ public class Bubble extends BaseT implements Runnable
     {
         int total = nomes.length;
         concluido = false;
-        a_ser_processado = total;
         String temp;
         for (int j = total; j >= 0; j--)
         {

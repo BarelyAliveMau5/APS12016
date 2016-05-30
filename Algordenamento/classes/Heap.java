@@ -9,7 +9,6 @@ public class Heap extends BaseT implements Runnable
     {
         this.nomes = nomes;
         processado = 0;
-        a_ser_processado = nomes.length;
     }
 
     private void heapSort()

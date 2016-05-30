@@ -14,7 +14,6 @@ public class Insertion extends BaseT implements Runnable
         int i, j, total = nomes.length;
         
         concluido = false;
-        a_ser_processado = total;
         
         String temp;
         for (i = 1; i < total; i++)

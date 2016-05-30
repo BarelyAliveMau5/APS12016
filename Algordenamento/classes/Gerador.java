@@ -48,7 +48,7 @@ public class Gerador extends BaseT implements Runnable
         //quando não há repetições, acontece o dobro de operações
         if (!repetir && Modo != modos.inversa && Modo != modos.semi_aleatoria)
             a_ser_processado = tamanho *2;
-        //em semi_aleatoria, 10% é repetido
+        //em semi_aleatoria, 10% é repetido (proporcao_semi_aleatoria /10)
         else if(Modo == modos.semi_aleatoria)
             a_ser_processado = tamanho + (tamanho / proporcao_semi_aleatoria);
         else

@@ -16,15 +16,17 @@ public class Log
         erro
     }
     
+    /**
+     * redireciona o StdOut para slog. futuramente será Static
+     **/
     public Log()
     {
-        //redirecionar o StdOut para slog
         slog = new ByteArrayOutputStream();
         System.setOut(new PrintStream(slog));
     }
 
     /**
-     * formata uma mensagem usando estilos predefinidos
+     * formata uma mensagem usando estilos pré-definidos
      **/
     public void msg(String message, estilos estilo)
     {
@@ -51,6 +53,9 @@ public class Log
         System.out.println(message);
     }
     
+    /**
+     * retorna o texto do log.
+     **/
     public String getLog()
     {
         return slog.toString();
