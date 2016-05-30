@@ -33,6 +33,7 @@ public class Heap extends BaseT implements Runnable
             processado++;
             fim--;
         }
+        processado++;
         concluido = true;
     }
 
