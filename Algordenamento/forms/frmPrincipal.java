@@ -132,6 +132,7 @@ public class frmPrincipal extends JFrame
      */
     public frmPrincipal()
     {
+        setTitle("Ordenador");
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 624, 559);
