@@ -126,8 +126,10 @@ public class Gerador extends BaseT implements Runnable
                 // fixo, usar IFs dentro de loops é lento.
                 if (fixo)
                 {
+                    String temp;
                     for (int i = 0; i < tamanho; i++) {
-                        nomes[i] = prefixo + pad.substring(temp.length()) + Randy(buffer) + posfixo;;
+                        temp = Randy(buffer) + posfixo;
+                        nomes[i] = prefixo + pad.substring(temp.length()) + temp;
                         processado++;
                     }
                 } 
