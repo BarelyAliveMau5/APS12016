@@ -20,6 +20,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import java.awt.event.ItemListener;
+import java.util.Arrays;
 import java.awt.event.ItemEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -76,6 +77,10 @@ public class frmPrincipal extends JFrame
     private Profiler        contador;
     private Thread          piao;
     private CtlOrdenador    algor;
+    private JButton         btnSalvarLista;
+    private JButton         btnCarregarLista;
+    private boolean         isListaSalva;
+    private String[]        lista_salva;     
     
     /**
      * escreve um texto formatado na caixa de texto jtp
@@ -95,6 +100,11 @@ public class frmPrincipal extends JFrame
         btnMostrarLista.setEnabled(!estado);
         btnOrdenar.setEnabled(!estado);
         cbAlgoritimo.setEnabled(!estado);
+        btnSalvarLista.setEnabled(!estado);
+        if (isListaSalva && !estado)
+            btnCarregarLista.setEnabled(true);
+        else
+            btnCarregarLista.setEnabled(false);
     }
     /**
      * Launch the application.
@@ -124,17 +134,16 @@ public class frmPrincipal extends JFrame
     {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 574, 560);
+        setBounds(100, 100, 624, 559);
         getContentPane().setLayout(null);
         
         log = new Log();
         
         panel = new JLayeredPane();
-        panel.setBounds(12, 12, 277, 373);
+        panel.setBounds(12, 12, 327, 373);
         panel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
         getContentPane().add(panel);
-        panel.setLayout(new MigLayout("", "[155.00px][94.00px,grow]",
-                "[20px][23px][25.00px][25.00][20.00][25.00][25.00][25.00][25.00][25.00][25.00][30.00]"));
+        panel.setLayout(new MigLayout("", "[155.00px][94.00px,grow]", "[20px][23px][25.00px][25.00][20.00][25.00][25.00][25.00][25.00][25.00][25.00][30.00]"));
 
         lblNitens = new JLabel("Número de itens:");
         panel.add(lblNitens, "cell 0 0,alignx left,aligny center");
@@ -192,18 +201,124 @@ public class frmPrincipal extends JFrame
         lblPsfixo.setToolTipText("Texto que vem após a numeração");
         panel.add(lblPsfixo, "cell 0 9,alignx left");
 
-        btnGerar = new JButton("Gerar lista");
-        btnGerar.setToolTipText("Produzir nomes de acordo com as especificações oferecidas");
-
         txtPostfix = new JTextField();
         txtPostfix.setText(".jpg");
         txtPostfix.setColumns(10);
         panel.add(txtPostfix, "cell 1 9,grow");
-        panel.add(btnGerar, "cell 0 11,aligny baseline");
+        
+                btnGerar = new JButton("Gerar nova lista");
+                btnGerar.setToolTipText("Produzir nomes de acordo com as especificações oferecidas");
+                panel.add(btnGerar, "cell 0 10,growx,aligny baseline");
+                
+                btnSalvarLista = new JButton("Salvar lista");
+                btnSalvarLista.addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent arg0) 
+                    {
+                        try
+                        {
+                            lista_salva =  Arrays.copyOf(ger.getNomes(), ger.getNomes().length); 
+                            logEvt("Lista salva",txtLog,estilos.ITALICO);
+                        }
+                        catch (Exception er)
+                        {
+                            logEvt("Erro: "+er.getMessage(),txtLog,estilos.ERRO);
+                        }
+                        isListaSalva = true;
+                        TravarControles(false);
+                    }
+                });
+                btnSalvarLista.setEnabled(false);
+                panel.add(btnSalvarLista, "cell 0 11,growx");
+                
+                btnCarregarLista = new JButton("Carregar lista");
+                btnCarregarLista.addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent e) 
+                    {
+                        try
+                        {
+                            if (!isListaSalva) throw new Exception("Tentativa de carregar sem estar salvo");
+                            ger.setNomes(lista_salva);
+                            logEvt("Lista carregada",txtLog,estilos.ITALICO);
+                        }
+                        catch (Exception er)
+                        {
+                            logEvt("Erro: "+er.getMessage(),txtLog,estilos.ERRO);
+                        }
+                    }
+                });
+                btnCarregarLista.setEnabled(false);
+                panel.add(btnCarregarLista, "cell 1 11,growx");
+                btnGerar.addActionListener(new ActionListener()
+                {
+                    public void actionPerformed(ActionEvent arg0)
+                    {
+                        //inicia contagem, antes de tudo
+                        contador = new Profiler();
+                        
+                        int tamanho = Integer.valueOf(spNumItems.getValue().toString());
+
+                        modos Modo = modos.aleatoria;
+                        if (rbRandom.isSelected())          Modo = modos.aleatoria;
+                        if (rbInverse.isSelected())         Modo = modos.inversa;
+                        if (rbLowVariation.isSelected())    Modo = modos.pouca_variacao;
+                        if (rbSemiRandom.isSelected())      Modo = modos.semi_aleatoria;
+                        
+                        try {
+                            if (tamanho < 100) throw new Exception("Número abaixo do mínimo permitido");
+                            
+                            ger = new Gerador(cbRepeat.isSelected(),    // permitir repetições
+                                    chckbxTamanhoFixo.isSelected(),     // tamanho fixo
+                                    Modo,                               // modo
+                                    tamanho,                            // numero total de itens
+                                    txtPrefix.getText(),                // texto prefixo
+                                    txtPostfix.getText());              // texto posfixo
+                            
+                            logEvt("Gerando lista de nomes com formato \""+ Modo.toString()+"\"",txtLog, estilos.NORMAL);
+                            
+                            //definir o numero de operações a ser processado
+                            pbProgresso.setMaximum(ger.getASerProcessado());
+                            
+                            // talvez isso não mude muita coisa pro garbage collector..
+                            ger.LimparNomes();
+                            
+                            TravarControles(true);
+                            // gera sempre um novo timer, não sei como otimizar isso em java
+                            tim = new Timer(16, new ActionListener()
+                            {
+                                public void actionPerformed(ActionEvent arg0)
+                                {
+                                    int processado = ger.getProcessado();
+                                    lblPorcento.setText(String.valueOf( processado ));
+                                    pbProgresso.setValue(processado);
+    
+                                    // se não parar, novos timers vão persistir
+                                    if (ger.getConcluido())
+                                    {
+                                        tim.stop();
+                                        TravarControles(false);
+                                        logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.NEGRITO);
+                                    } 
+                                    else 
+                                        TravarControles(true);
+                                }
+                            });
+    
+                            tim.start();
+                            piao = new Thread(ger);
+                            piao.start();
+                        } 
+                        catch (Exception er)
+                        {
+                            logEvt("Erro: "+er.getMessage(),txtLog,estilos.ERRO);
+                        }
+                    }
+                });
 
         pnOrdenar = new JPanel();
         pnOrdenar.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-        pnOrdenar.setBounds(301, 12, 259, 373);
+        pnOrdenar.setBounds(351, 12, 259, 373);
         getContentPane().add(pnOrdenar);
         pnOrdenar.setLayout(null);
 
@@ -244,17 +359,17 @@ public class frmPrincipal extends JFrame
 
         pbProgresso = new JProgressBar();
         pbProgresso.setToolTipText("Progresso da operação atual");
-        pbProgresso.setBounds(12, 397, 472, 13);
+        pbProgresso.setBounds(12, 397, 528, 13);
         getContentPane().add(pbProgresso);
 
         lblPorcento = new JLabel("0");
         lblPorcento.setToolTipText("Número de operações realizadas na lista de nomes virtual");
         lblPorcento.setHorizontalAlignment(SwingConstants.CENTER);
-        lblPorcento.setBounds(488, 397, 72, 15);
+        lblPorcento.setBounds(538, 395, 72, 15);
         getContentPane().add(lblPorcento);
         
         scrLog = new JScrollPane();
-        scrLog.setBounds(12, 422, 548, 100);
+        scrLog.setBounds(12, 422, 598, 99);
         getContentPane().add(scrLog);
         
         txtLog = new JEditorPane();
@@ -369,71 +484,6 @@ public class frmPrincipal extends JFrame
         /**
          * óh botão que gera os nomes
          ***/
-        btnGerar.addActionListener(new ActionListener()
-        {
-            public void actionPerformed(ActionEvent arg0)
-            {
-                //inicia contagem, antes de tudo
-                contador = new Profiler();
-                
-                int tamanho = Integer.valueOf(spNumItems.getValue().toString());
-
-                modos Modo = modos.aleatoria;
-                if (rbRandom.isSelected())          Modo = modos.aleatoria;
-                if (rbInverse.isSelected())         Modo = modos.inversa;
-                if (rbLowVariation.isSelected())    Modo = modos.pouca_variacao;
-                if (rbSemiRandom.isSelected())      Modo = modos.semi_aleatoria;
-                
-                try {
-                    if (tamanho < 100) throw new Exception("Número abaixo do mínimo permitido");
-                    
-                    ger = new Gerador(cbRepeat.isSelected(),    // permitir repetições
-                            chckbxTamanhoFixo.isSelected(),     // tamanho fixo
-                            Modo,                               // modo
-                            tamanho,                            // numero total de itens
-                            txtPrefix.getText(),                // texto prefixo
-                            txtPostfix.getText());              // texto posfixo
-                    
-                    logEvt("Gerando lista de nomes com formato \""+ Modo.toString()+"\"",txtLog, estilos.NORMAL);
-                    
-                    //definir o numero de operações a ser processado
-                    pbProgresso.setMaximum(ger.getASerProcessado());
-                    
-                    // talvez isso não mude muita coisa pro garbage collector..
-                    ger.LimparNomes();
-                    
-                    TravarControles(true);
-                    // gera sempre um novo timer, não sei como otimizar isso em java
-                    tim = new Timer(16, new ActionListener()
-                    {
-                        public void actionPerformed(ActionEvent arg0)
-                        {
-                            int processado = ger.getProcessado();
-                            lblPorcento.setText(String.valueOf( processado ));
-                            pbProgresso.setValue(processado);
-    
-                            // se não parar, novos timers vão persistir
-                            if (ger.getConcluido())
-                            {
-                                tim.stop();
-                                TravarControles(false);
-                                logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.NEGRITO);
-                            } 
-                            else 
-                                TravarControles(true);
-                        }
-                    });
-    
-                    tim.start();
-                    piao = new Thread(ger);
-                    piao.start();
-                } 
-                catch (Exception er)
-                {
-                    logEvt("Erro: "+er.getMessage(),txtLog,estilos.ERRO);
-                }
-            }
-        });
 
         /**
          * mostrar as coisas na lista

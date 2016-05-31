@@ -62,6 +62,11 @@ public class Gerador extends BaseT implements Runnable
     {
         return this.nomes;
     }
+    
+    public void setNomes(String[] nomes)
+    {
+        this.nomes = nomes;
+    }
 
     /**
      * isso muda alguma coisa?
