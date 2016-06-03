@@ -41,7 +41,7 @@ public class Gerador extends BaseT implements Runnable
         pad = new String("");
         // cria X numeros de zeros
         if (fixo)
-            pad = new String(new char[String.valueOf(tamanho).length() - 1]).replace('\0', '0');
+            pad = new String(new char[String.valueOf(tamanho-1).length()]).replace('\0', '0');
 
         this.prefixo = prefixo;
         this.posfixo = posfixo;
@@ -215,9 +215,14 @@ public class Gerador extends BaseT implements Runnable
             
             erro = false;
         }
-        catch (Exception err)
+        catch (Exception err )
         {
             er = err;
+            erro = true;
+        }
+        catch(OutOfMemoryError outch)
+        {
+            er = new Exception(outch.getMessage());
             erro = true;
         }
         concluido = true;

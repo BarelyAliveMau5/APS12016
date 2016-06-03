@@ -24,7 +24,7 @@ public class Log
         slog = new ByteArrayOutputStream();
         PrintStream t = new PrintStream(slog);
 
-        System.setErr(t);
+      //  System.setErr(t);
         System.setOut(t);
     }
 

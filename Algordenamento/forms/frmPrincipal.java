@@ -298,11 +298,16 @@ public class frmPrincipal extends JFrame
                                     if (ger.getConcluido())
                                     {
                                         tim.stop();
-                                        TravarControles(false);
-                                        if (ger.getErro())
+                                        if (ger.getErro()) 
+                                        {
                                             logEvt("Erro:"+ ger.getException().getMessage(), txtLog, estilos.ERRO);
+                                            btnGerar.setEnabled(true);
+                                        }
                                         else
+                                        {
                                             logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.NEGRITO);
+                                            TravarControles(false);
+                                        }
                                     } 
                                     else 
                                         TravarControles(true);
