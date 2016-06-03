@@ -299,7 +299,10 @@ public class frmPrincipal extends JFrame
                                     {
                                         tim.stop();
                                         TravarControles(false);
-                                        logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.NEGRITO);
+                                        if (ger.getErro())
+                                            logEvt("Erro:"+ ger.getException().getMessage(), txtLog, estilos.ERRO);
+                                        else
+                                            logEvt("Geração de nomes concluída em "+ contador.Tempo_Final(false) , txtLog, estilos.NEGRITO);
                                     } 
                                     else 
                                         TravarControles(true);

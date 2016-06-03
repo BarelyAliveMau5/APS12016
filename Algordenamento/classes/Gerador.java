@@ -26,6 +26,8 @@ public class Gerador extends BaseT implements Runnable
     private String pad;
     private String posfixo;
     private boolean fixo;
+    private Exception er;
+    private boolean erro;
 
     /**
      * prepara o worker
@@ -39,7 +41,7 @@ public class Gerador extends BaseT implements Runnable
         pad = new String("");
         // cria X numeros de zeros
         if (fixo)
-            pad = new String(new char[prefixo.length() + String.valueOf(tamanho).length() - 1]).replace('\0', '0');
+            pad = new String(new char[String.valueOf(tamanho).length() - 1]).replace('\0', '0');
 
         this.prefixo = prefixo;
         this.posfixo = posfixo;
@@ -97,116 +99,126 @@ public class Gerador extends BaseT implements Runnable
      **/
     public void Gerar()
     {
-        nomes = new String[tamanho];
-        concluido = false;
-        processado = 0;
-        int[] buffer = null; //TEM QUE INICIAR NULO
-        
-        switch (Modo)
+        try 
         {
-        case pouca_variacao:
-            //o divisor controla a proporção de repetições.
-            //quanto maior o divisor, mais repetições.
-             buffer = new int[tamanho/proporcao_semi_aleatoria];
+            nomes = new String[tamanho];
+            concluido = false;
+            processado = 0;
+            int[] buffer = null; //TEM QUE INICIAR NULO
             
-            for (int i=0;i<buffer.length;i++)
-                buffer[i] = Randy(null);
-                
-        // FALL THROUGHT INTENCIONAL!!
-        // buffer TEM QUE SER nulo se não for passar pelo codigo acima.
-        // Randy(buffer) com buffer null é intencional para esta logica
-        // só assim tudo acontece como deve, sem eu precisar reescrever codigo
-        case semi_aleatoria:
-        // FALL THROUGHT INTENCIONAL!!
-        // a variavel uTamanho lida com isso, pra evitar reescrever
-        // o mesmo codigo. leia com cautela o código, ele é autoexplicativo
-        case aleatoria:
-
-            // aqui os numeros aleatorios são gerados on-the-fly
-            if (repetir)
+            switch (Modo)
             {
-                // porquê do codigo repetido:
-                // é mais simples que contornar um bug onde o pad tem uma length
-                // menor que o temp, e também usa menos processamento se não for
-                // fixo, usar IFs dentro de loops é lento.
-                if (fixo)
+            case pouca_variacao:
+                //o divisor controla a proporção de repetições.
+                //quanto maior o divisor, mais repetições.
+                 buffer = new int[tamanho/proporcao_semi_aleatoria];
+                
+                for (int i=0;i<buffer.length;i++)
+                    buffer[i] = Randy(null);
+                    
+            // FALL THROUGHT INTENCIONAL!!
+            // buffer TEM QUE SER nulo se não for passar pelo codigo acima.
+            // Randy(buffer) com buffer null é intencional para esta logica
+            // só assim tudo acontece como deve, sem eu precisar reescrever codigo
+            case semi_aleatoria:
+            // FALL THROUGHT INTENCIONAL!!
+            // a variavel uTamanho lida com isso, pra evitar reescrever
+            // o mesmo codigo. leia com cautela o código, ele é autoexplicativo
+            case aleatoria:
+    
+                // aqui os numeros aleatorios são gerados on-the-fly
+                if (repetir)
                 {
-                    String temp;
-                    for (int i = 0; i < tamanho; i++) {
-                        temp = Randy(buffer) + posfixo;
-                        nomes[i] = prefixo + pad.substring(temp.length()) + temp;
-                        processado++;
-                    }
-                } 
-                else 
-                {
-                    for (int i = 0; i < tamanho; i++) {
-                        nomes[i] = prefixo + Randy(buffer) + posfixo;
-                        processado++;
+                    // porquê do codigo repetido:
+                    // é mais simples que contornar um bug onde o pad tem uma length
+                    // menor que o temp, e também usa menos processamento se não for
+                    // fixo, usar IFs dentro de loops é lento.
+                    if (fixo)
+                    {
+                        String temp;
+                        for (int i = 0; i < tamanho; i++) {
+                            temp = String.valueOf(Randy(buffer));
+                            nomes[i] = prefixo + pad.substring(temp.length()) +temp+ posfixo;
+                            processado++;
+                        }
+                    } 
+                    else 
+                    {
+                        for (int i = 0; i < tamanho; i++) {
+                            nomes[i] = prefixo + Randy(buffer) + posfixo;
+                            processado++;
+                        }
                     }
                 }
-            }
-            // aqui uma lista é gerada e então embaralhada, leva o dobro de operações
-            else
-            {
-                if (fixo) 
-                {
-                    for (int i = 0; i < tamanho; i++){
-                        nomes[i] = prefixo + pad.substring(String.valueOf(i).length() + posfixo.length()) + i + posfixo;
-                        processado++;
-                    }
-                } 
+                // aqui uma lista é gerada e então embaralhada, leva o dobro de operações
                 else
                 {
-                    for (int i = 0; i < tamanho; i++) {
-                        nomes[i] = prefixo + i + posfixo;
+                    if (fixo) 
+                    {
+                        for (int i = 0; i < tamanho; i++){
+                            nomes[i] = prefixo + pad.substring(String.valueOf(i).length()) + i + posfixo;
+                            processado++;
+                        }
+                    } 
+                    else
+                    {
+                        for (int i = 0; i < tamanho; i++) {
+                            nomes[i] = prefixo + i + posfixo;
+                            processado++;
+                        }
+                    }
+                    
+                    // trocar indices dos lugares
+                    // caso seja semi-aleatoria, embaralhar parcialmente
+                    String strTroca;
+                    int idx1, idx2;
+                    int uTamanho = tamanho;
+                    
+                    //evitar merda de usuario
+                    if (tamanho > 10)
+                        if (Modo == modos.semi_aleatoria)
+                            uTamanho = uTamanho / 10;
+                    
+                    for (int i = 0; i < uTamanho; i++)
+                    {
+                        idx1 = Randy(buffer);
+                        idx2 = Randy(buffer);
+                        // inverte com o valor da posição aleatoria
+                        strTroca = nomes[idx2];
+                        nomes[idx2] = nomes[idx1];
+                        nomes[idx1] = strTroca;
                         processado++;
                     }
                 }
-                
-                // trocar indices dos lugares
-                // caso seja semi-aleatoria, embaralhar parcialmente
-                String strTroca;
-                int idx1, idx2;
-                int uTamanho = tamanho;
-                
-                //evitar merda de usuario
-                if (tamanho > 10)
-                    if (Modo == modos.semi_aleatoria)
-                        uTamanho = uTamanho / 10;
-                
-                for (int i = 0; i < uTamanho; i++)
+                break;
+    
+            case inversa:
+                // mesmo esquema dito acima sobre o bug do pad e otimização extra
+                if (fixo)
                 {
-                    idx1 = Randy(buffer);
-                    idx2 = Randy(buffer);
-                    // inverte com o valor da posição aleatoria
-                    strTroca = nomes[idx2];
-                    nomes[idx2] = nomes[idx1];
-                    nomes[idx1] = strTroca;
-                    processado++;
+                    for (int i = tamanho-1; i >= 0; i--){
+                        nomes[tamanho-1-i] = prefixo + pad.substring(String.valueOf(i).length()) + i + posfixo;
+                        processado++;
+                    }
+                } else
+                {
+                    for (int i = tamanho; i > 0; i--){
+                        nomes[tamanho-i] = prefixo + i + posfixo;
+                        processado++;
+                    }
                 }
+                break;
+    
+            default:
+                break;
             }
-            break;
-
-        case inversa:
-            // mesmo esquema dito acima sobre o bug do pad e otimização extra
-            if (fixo)
-            {
-                for (int i = tamanho; i > 0; i--){
-                    nomes[tamanho-i] = prefixo + pad.substring(String.valueOf(i).length() + posfixo.length()) + i + posfixo;
-                    processado++;
-                }
-            } else
-            {
-                for (int i = tamanho; i > 0; i--){
-                    nomes[tamanho-i] = prefixo + i + posfixo;
-                    processado++;
-                }
-            }
-            break;
-
-        default:
-            break;
+            
+            erro = false;
+        }
+        catch (Exception err)
+        {
+            er = err;
+            erro = true;
         }
         concluido = true;
     }
@@ -219,4 +231,15 @@ public class Gerador extends BaseT implements Runnable
     {
         Gerar();
     }
+
+    public Exception getException()
+    {
+        return er;
+    }
+    
+    public boolean getErro()
+    {
+        return erro;
+    }
+
 }

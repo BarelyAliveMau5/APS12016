@@ -22,7 +22,10 @@ public class Log
     public Log()
     {
         slog = new ByteArrayOutputStream();
-        System.setOut(new PrintStream(slog));
+        PrintStream t = new PrintStream(slog);
+
+        System.setErr(t);
+        System.setOut(t);
     }
 
     /**
