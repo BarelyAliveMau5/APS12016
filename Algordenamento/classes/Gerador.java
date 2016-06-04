@@ -1,5 +1,7 @@
 package classes;
 
+import java.util.Arrays;
+
 /**
  * essa classe gera os nomes aleatorios pros supostos arquivos.
  **/
@@ -67,7 +69,8 @@ public class Gerador extends BaseT implements Runnable
     
     public void setNomes(String[] nomes)
     {
-        this.nomes = nomes;
+        this.nomes = Arrays.copyOf(nomes, nomes.length);
+        
     }
 
     /**
