@@ -508,7 +508,7 @@ public class frmPrincipal extends JFrame
                 lstNomes.setModel(new AbstractListModel<String>()
                 {
                     private static final long serialVersionUID = 1L;
-                    String[] values = ger.getNomes();
+                    String[] values = Arrays.copyOf(ger.getNomes(), ger.getNomes().length); 
 
                     public int getSize()
                     {
