@@ -1,7 +1,7 @@
 # APS12016
 
 
-##alguns pontos bons do projeto:
+## alguns pontos bons do projeto:
 
 - texto prefixo (e.g.: foto_100) e posfixo  (e.g.: 100.jpg) na geração de nomes
 - permitir que se repita nomes ou não
@@ -11,7 +11,7 @@
 - salvar e carregar lista previamente gerada
 
 
-##pontos ruins:
+## pontos ruins:
 
 - o código tá meio mal organizado, ainda estou arrumando onde posso e colocando muitos comentarios em tudo de util.
 - gerar 1000000 itens leva em torno de 5 segundos mas consome aproximadamente 50mb
