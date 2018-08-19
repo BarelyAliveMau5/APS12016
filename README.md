@@ -9,6 +9,7 @@ Este projeto tem o propósito de mostrar a eficiência de cada um dos métodos d
 - a geração de nomes executa numa thread separada, assim dá pra ver o progresso da operação sem travar o programa
 - log dos eventos ocorridos com texto formatado e colorido
 - salvar e carregar lista previamente gerada
+- permite testar os algoritmos de ordenação: Heap, Bubble e Insertion sort
 
 
 ## Caractersticas ruins do projeto:
