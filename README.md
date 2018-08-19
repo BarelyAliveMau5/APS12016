@@ -16,6 +16,6 @@ Este projeto tem o propósito de mostrar a eficiência de cada um dos métodos d
 - o código está meio mal organizado.
 - gerar 1000000 itens leva em torno de 5 segundos e consome aproximadamente 50mb
 - foi usado muito codigo em closures, isso dificulta a legibilidade do código da janela principal 
--  provavel que exista alguns bugs ainda não descobertos
+- é muito provável que exista alguns bugs ainda não descobertos
 
 ![geracao](http://i.imgur.com/VRH7Q8o.png)
